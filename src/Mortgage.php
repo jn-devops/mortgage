@@ -7,6 +7,7 @@ use Homeful\Borrower\Borrower;
 use Homeful\Mortgage\Classes\CashOut;
 use Homeful\Payment\Enums\Cycle;
 use Homeful\Property\Property;
+use Illuminate\Support\Collection;
 use Whitecube\Price\Price;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Arr;
@@ -51,6 +52,9 @@ class Mortgage
      * @param Property $property
      * @param Borrower $borrower
      * @param array $params
+     * @throws \Brick\Math\Exception\NumberFormatException
+     * @throws \Brick\Math\Exception\RoundingNecessaryException
+     * @throws \Brick\Money\Exception\UnknownCurrencyException
      */
     public function __construct(Property $property, Borrower $borrower, array $params)
     {
@@ -150,6 +154,14 @@ class Mortgage
 //        return new Price($amount);
 //    }
 
+    /**
+     * @return bool
+     * @throws \Brick\Math\Exception\MathException
+     * @throws \Brick\Math\Exception\NumberFormatException
+     * @throws \Brick\Math\Exception\RoundingNecessaryException
+     * @throws \Brick\Money\Exception\MoneyMismatchException
+     * @throws \Brick\Money\Exception\UnknownCurrencyException
+     */
     public function isPromotional(): bool
     {
         $deductible_cash_outs = $this->getCashOuts()->sum(function(CashOut $cash_out) {
@@ -158,8 +170,6 @@ class Mortgage
 
         return $this->getLowCashOut()->inclusive()->compareTo($deductible_cash_outs) == 1;
     }
-
-
 
     /**
      * @return Money

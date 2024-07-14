@@ -13,4 +13,5 @@ class Input
     const CONSULTING_FEE = 'consulting_fee';
     const DP_TERM = 'down_payment_term';
     const LOW_CASH_OUT = 'low_cash_out';
+    const PARTIAL_MISCELLANEOUS_FEES = 'partial_miscellaneous_fees';
 }

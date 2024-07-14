@@ -36,9 +36,10 @@ class UpdateDownPayment
         with($event->mortgage, function (Mortgage $mortgage) {
             $percent_dp = $mortgage->getPercentDownPayment();
             $partial_tcp = $mortgage->getContractPrice()->inclusive()->multipliedBy($percent_dp, roundingMode: RoundingMode::CEILING)->getAmount()->toFloat();
-            $deductible_cash_outs = $mortgage->getCashOuts()->sum(function(CashOut $cash_out) {
-                return $cash_out->getAmount()->inclusive()->getAmount()->toFloat();
-            });
+//            $deductible_cash_outs = $mortgage->getCashOuts()->sum(function(CashOut $cash_out) {
+//                return $cash_out->getAmount()->inclusive()->getAmount()->toFloat();
+//            });
+            $deductible_cash_outs = 0;
             $dp = $mortgage->isPromotional() ? 0.0 : $partial_tcp - $deductible_cash_outs;
             $down_payment = (new Payment)
                 ->setPrincipal($dp)

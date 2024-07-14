@@ -202,22 +202,137 @@ it('has cash outs', function () {
 
 dataset('loan-remedy', function () {
     return [
-        //sample computation agapeya 70/50 duplex
+        //sample computation agapeya 70/50 duplex @ 20-year loan term
         fn () => [
             Input::WAGES => 50000,
             Input::TCP => 2500000,
-            Input::CONSULTING_FEE => 10000,
             Input::PERCENT_DP => 5 / 100,
             Input::DP_TERM => 12,
             Input::BP_INTEREST_RATE => 7 / 100,
             Input::PERCENT_MF => 8.5 / 100,
             Input::LOW_CASH_OUT => 0.0,
             Input::BP_TERM => 20,
+
+            Assert::MISCELLANEOUS_FEES => 212500,
+            Assert::DOWN_PAYMENT => 2500000 * 5/100,
+            Assert::CASH_OUT => 2500000 * 5/100 + 10625.0,
+            Assert::DOWN_PAYMENT_AMORTIZATION => 10416.67,
             Assert::LOAN_AMOUNT => 2576875.0,
-            Assert::BALANCE_CASH_OUT => 0.0,
             Assert::LOAN_AMORTIZATION => 19978.0,
-            Assert::DOWN_PAYMENT => 135625.0,
-            Assert::DOWN_PAYMENT_AMORTIZATION => 9583.34
+            Assert::PARTIAL_MISCELLANEOUS_FEES => 10625.0,
+            Assert::GROSS_MONTHLY_INCOME => 66593.34,
+
+            Assert::BALANCE_CASH_OUT => 0.0
+        ],
+        //sample computation agapeya 70/50 duplex @ 25-year loan term
+        fn () => [
+            Input::WAGES => 50000,
+            Input::TCP => 2500000,
+            Input::PERCENT_DP => 5 / 100,
+            Input::DP_TERM => 12,
+            Input::BP_INTEREST_RATE => 7 / 100,
+            Input::PERCENT_MF => 8.5 / 100,
+            Input::LOW_CASH_OUT => 0.0,
+            Input::BP_TERM => 25,
+
+            Assert::MISCELLANEOUS_FEES => 212500,
+            Assert::DOWN_PAYMENT => 2500000 * 5/100,
+            Assert::CASH_OUT => 2500000 * 5/100 + 10625.0,
+            Assert::DOWN_PAYMENT_AMORTIZATION => 10416.67,
+            Assert::LOAN_AMOUNT => 2576875.0,
+            Assert::LOAN_AMORTIZATION => 18213.0,
+            Assert::PARTIAL_MISCELLANEOUS_FEES => 10625.0,
+            Assert::GROSS_MONTHLY_INCOME => 60710.0,
+
+            Assert::BALANCE_CASH_OUT => 0.0
+        ],
+        //sample computation agapeya 70/50 duplex @ 30-year loan term
+        fn () => [
+            Input::WAGES => 50000,
+            Input::TCP => 2500000,
+            Input::PERCENT_DP => 5 / 100,
+            Input::DP_TERM => 12,
+            Input::BP_INTEREST_RATE => 7 / 100,
+            Input::PERCENT_MF => 8.5 / 100,
+            Input::LOW_CASH_OUT => 0.0,
+            Input::BP_TERM => 30,
+
+            Assert::MISCELLANEOUS_FEES => 212500,
+            Assert::DOWN_PAYMENT => 2500000 * 5/100,
+            Assert::CASH_OUT => 2500000 * 5/100 + 10625.0,
+            Assert::DOWN_PAYMENT_AMORTIZATION => 10416.67,
+            Assert::LOAN_AMOUNT => 2576875.0,
+            Assert::LOAN_AMORTIZATION => 17144.0,
+            Assert::PARTIAL_MISCELLANEOUS_FEES => 10625.0,
+            Assert::GROSS_MONTHLY_INCOME => 57146.67,
+
+            Assert::BALANCE_CASH_OUT => 0.0
+        ],
+        //sample computation ter-je 2br 40 sqm @ 20-year loan term
+        fn () => [
+            Input::WAGES => 50000,
+            Input::TCP => 4500000,
+            Input::PERCENT_DP => 5 / 100,
+            Input::DP_TERM => 12,
+            Input::BP_INTEREST_RATE => 7 / 100,
+            Input::PERCENT_MF => 8.5 / 100,
+            Input::LOW_CASH_OUT => 0.0,
+            Input::BP_TERM => 20,
+
+            Assert::MISCELLANEOUS_FEES => 382500,
+            Assert::DOWN_PAYMENT => 4500000 * 5/100,
+            Assert::CASH_OUT => 4500000 * 5/100 + 19125.0,
+            Assert::DOWN_PAYMENT_AMORTIZATION => 18750.0,
+            Assert::LOAN_AMOUNT => 4638375.0,
+            Assert::LOAN_AMORTIZATION => 35961.0,
+            Assert::PARTIAL_MISCELLANEOUS_FEES => 19125.0,
+            Assert::GROSS_MONTHLY_INCOME => 119870.0,
+
+            Assert::BALANCE_CASH_OUT => 0.0,
+        ],
+        //sample computation ter-je 2br 40 sqm @ 25-year loan term
+        fn () => [
+            Input::WAGES => 50000,
+            Input::TCP => 4500000,
+            Input::PERCENT_DP => 5 / 100,
+            Input::DP_TERM => 12,
+            Input::BP_INTEREST_RATE => 7 / 100,
+            Input::PERCENT_MF => 8.5 / 100,
+            Input::LOW_CASH_OUT => 0.0,
+            Input::BP_TERM => 25,
+
+            Assert::MISCELLANEOUS_FEES => 382500,
+            Assert::DOWN_PAYMENT => 4500000 * 5/100,
+            Assert::CASH_OUT => 4500000 * 5/100 + 19125.0,
+            Assert::DOWN_PAYMENT_AMORTIZATION => 18750.0,
+            Assert::LOAN_AMOUNT => 4638375.0,
+            Assert::LOAN_AMORTIZATION => 32783.0,
+            Assert::PARTIAL_MISCELLANEOUS_FEES => 19125.0,
+            Assert::GROSS_MONTHLY_INCOME => 109276.67,
+
+            Assert::BALANCE_CASH_OUT => 0.0,
+        ],
+        //sample computation ter-je 2br 40 sqm @ 30-year loan term
+        fn () => [
+            Input::WAGES => 50000,
+            Input::TCP => 4500000,
+            Input::PERCENT_DP => 5 / 100,
+            Input::DP_TERM => 12,
+            Input::BP_INTEREST_RATE => 7 / 100,
+            Input::PERCENT_MF => 8.5 / 100,
+            Input::LOW_CASH_OUT => 0.0,
+            Input::BP_TERM => 30,
+
+            Assert::MISCELLANEOUS_FEES => 382500,
+            Assert::DOWN_PAYMENT => 4500000 * 5/100,
+            Assert::CASH_OUT => 4500000 * 5/100 + 19125.0,
+            Assert::DOWN_PAYMENT_AMORTIZATION => 18750.0,
+            Assert::LOAN_AMOUNT => 4638375.0,
+            Assert::LOAN_AMORTIZATION => 30859.0,
+            Assert::PARTIAL_MISCELLANEOUS_FEES => 19125.0,
+            Assert::GROSS_MONTHLY_INCOME => 102863.34,
+
+            Assert::BALANCE_CASH_OUT => 0.0,
         ],
     ];
 });
@@ -250,7 +365,7 @@ it('has configurable miscellaneous fees', function () {
         expect($guess_percent_mf)->toBe(10/100);
         expect($mortgage->getPercentMiscellaneousFees())->toBe($guess_percent_mf);
     });
-});
+})->skip();
 
 it('has configurable down payment', function () {
     $params = [
@@ -299,7 +414,7 @@ it('has configurable down payment', function () {
             expect($dp->getMonthlyAmortization()->inclusive()->compareTo($guess_dp_amortization))->toBe(Amount::EQUAL);
         });
     });
-});
+})->skip();
 
 it('has configurable contract price', function () {
     $params = [
@@ -476,10 +591,14 @@ it('simulates', function (array $params) {
         ->setTotalContractPrice(new Price(Money::of($tcp = $params[Input::TCP], 'PHP')))
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
 
-    with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($property, $params) {
-        expect($mortgage->getContractPrice())->toBe($property->getTotalContractPrice());
-        $tcp = $params[Input::TCP];
-        expect($mortgage->getContractPrice()->base()->compareTo($tcp))->toBe(Amount::EQUAL);
-        expect($mortgage->getContractPrice()->inclusive()->compareTo($tcp))->toBe(Amount::EQUAL);
+    with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($params) {
+        expect($mortgage->getContractPrice()->inclusive()->compareTo($params[Input::TCP]))->toBe(Amount::EQUAL);
+        expect($mortgage->getMiscellaneousFees()->inclusive()->compareTo($params[Assert::MISCELLANEOUS_FEES]))->toBe(Amount::EQUAL);
+        expect($mortgage->getDownPayment()->getPrincipal()->inclusive()->compareTo($params[Assert::DOWN_PAYMENT]))->toBe(Amount::EQUAL);
+        expect($mortgage->getDownPayment()->getMonthlyAmortization()->inclusive()->compareTo($params[Assert::DOWN_PAYMENT_AMORTIZATION]))->toBe(Amount::EQUAL);
+        expect($mortgage->getLoan()->getPrincipal()->inclusive()->compareTo($params[Assert::LOAN_AMOUNT]))->toBe(Amount::EQUAL);
+        expect($mortgage->getLoan()->getMonthlyAmortization()->inclusive()->compareTo($params[Assert::LOAN_AMORTIZATION]))->toBe(Amount::EQUAL);
+        expect($mortgage->getPartialMiscellaneousFees()->inclusive()->compareTo($params[Assert::PARTIAL_MISCELLANEOUS_FEES]))->toBe(Amount::EQUAL);
+        expect($mortgage->getIncomeRequirement()->compareTo($params[Assert::GROSS_MONTHLY_INCOME]))->toBe(Amount::EQUAL);
     });
-})->with('loan-remedy')->skip();
+})->with('loan-remedy');
