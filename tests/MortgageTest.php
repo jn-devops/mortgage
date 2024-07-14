@@ -318,6 +318,7 @@ it('has configurable contract price', function () {
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
 
     with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($property, $params) {
+        //confirm inputs
         expect($params[Input::TCP])->toBe($input_tcp = 2500000);
         expect($params[Input::PERCENT_DP])->toBe($input_percent_dp = 5/100);
         expect($params[Input::PERCENT_MF])->toBe($input_percent_mf = 8.5/100);
@@ -325,6 +326,7 @@ it('has configurable contract price', function () {
         expect($params[Input::BP_TERM])->toBe($input_bp_term = 20);
         expect($params[Input::BP_INTEREST_RATE])->toBe($input_bp_interest_rate = 7/100);
 
+        //confirm properties from inputs
         expect($mortgage->getContractPrice()->inclusive()->compareTo($input_tcp))->toBe(Amount::EQUAL);
         expect($mortgage->getPercentDownPayment())->toBe($input_percent_dp);
         expect($mortgage->getPercentMiscellaneousFees())->toBe($input_percent_mf);
@@ -332,6 +334,7 @@ it('has configurable contract price', function () {
         expect($mortgage->getBalancePaymentTerm())->toBe($input_bp_term);
         expect($mortgage->getInterestRate())->toBe($input_bp_interest_rate);
 
+        //down payment
         $guess_dp = Money::of($input_tcp * $input_percent_dp, 'PHP');
         expect($guess_dp->compareTo(125000))->toBe(Amount::EQUAL);
         expect($mortgage->getDownPayment()->getPrincipal()->inclusive()->compareTo($guess_dp))->toBe(Amount::EQUAL);
@@ -339,6 +342,7 @@ it('has configurable contract price', function () {
         expect($guess_dp_amortization->compareTo(10416.67))->toBe(Amount::EQUAL);
         expect($mortgage->getDownPayment()->getMonthlyAmortization()->inclusive()->compareTo($guess_dp_amortization))->toBe(Amount::EQUAL);
 
+        //miscellaneous fees
         $guess_mf = Money::of($input_tcp * $input_percent_mf, 'PHP');
         expect($guess_mf->compareTo(212500.0))->toBe(Amount::EQUAL);
         expect($mortgage->getMiscellaneousFees()->inclusive()->compareTo($guess_mf))->toBe(Amount::EQUAL);
@@ -346,10 +350,12 @@ it('has configurable contract price', function () {
         expect($guess_partial_mf->compareTo(10625.0))->toBe(Amount::EQUAL);
         expect($mortgage->getPartialMiscellaneousFees()->inclusive()->compareTo($guess_partial_mf))->toBe(Amount::EQUAL);
 
-        $guess_bp = Money::of($input_tcp * (1-$input_percent_dp), 'PHP');
+        //balance payment
+        $guess_bp = Money::of($input_tcp * (1 - $input_percent_dp), 'PHP');
         expect($guess_bp->compareTo(2375000.0))->toBe(Amount::EQUAL);
         expect($mortgage->getBalancePayment()->inclusive()->compareTo($guess_bp))->toBe(Amount::EQUAL);
 
+        //loan @ 20-year term
         $guess_loan = $guess_bp->plus($guess_mf->minus($guess_partial_mf));
         expect($guess_loan->getAmount()->compareTo(2576875.0))->toBe(Amount::EQUAL);
         expect($mortgage->getLoan()->getPrincipal()->inclusive()->compareTo($guess_loan))->toBe(Amount::EQUAL);
@@ -364,6 +370,7 @@ it('has configurable contract price', function () {
         expect($guess_income_requirement->compareTo(66593.34))->toBe(Amount::EQUAL);
         expect($mortgage->getIncomeRequirement()->compareTo($guess_income_requirement))->toBe(Amount::EQUAL);
 
+        //loan @ 25-year term
         $input_bp_term = 25;
         $mortgage->setBalancePaymentTerm($input_bp_term);
         expect($mortgage->getLoan()->getTerm()->value)->toBe($input_bp_term);
@@ -375,6 +382,7 @@ it('has configurable contract price', function () {
         expect($guess_income_requirement->compareTo(60710.0))->toBe(Amount::EQUAL);
         expect($mortgage->getIncomeRequirement()->compareTo($guess_income_requirement))->toBe(Amount::EQUAL);
 
+        //loan @ 30-year term
         $input_bp_term = 30;
         $mortgage->setBalancePaymentTerm($input_bp_term);
         expect($mortgage->getLoan()->getTerm()->value)->toBe($input_bp_term);
@@ -386,14 +394,17 @@ it('has configurable contract price', function () {
         expect($guess_income_requirement->compareTo(57146.67))->toBe(Amount::EQUAL);
         expect($mortgage->getIncomeRequirement()->compareTo($guess_income_requirement))->toBe(Amount::EQUAL);
 
+        //change contract price
         $mortgage->setContractPrice($new_tcp = 4500000.0);
 
+        //confirm properties from inputs
         expect($mortgage->getContractPrice()->inclusive()->compareTo($new_tcp))->toBe(Amount::EQUAL);
         expect($mortgage->getPercentDownPayment())->toBe($input_percent_dp);
         expect($mortgage->getPercentMiscellaneousFees())->toBe($input_percent_mf);
         expect($mortgage->getDownPaymentTerm())->toBe($input_dp_term);
         expect($mortgage->getBalancePaymentTerm())->toBe($input_bp_term);
 
+        //down payment
         $guess_dp = Money::of($new_tcp * $input_percent_dp, 'PHP');
         expect($guess_dp->compareTo(225000.0))->toBe(Amount::EQUAL);
         expect($mortgage->getDownPayment()->getPrincipal()->inclusive()->compareTo($guess_dp))->toBe(Amount::EQUAL);
@@ -401,6 +412,7 @@ it('has configurable contract price', function () {
         expect($guess_dp_amortization->compareTo(18750.0))->toBe(Amount::EQUAL);
         expect($mortgage->getDownPayment()->getMonthlyAmortization()->inclusive()->compareTo($guess_dp_amortization))->toBe(Amount::EQUAL);
 
+        //miscellaneous fees
         $guess_mf = Money::of($new_tcp * $input_percent_mf, 'PHP');
         expect($guess_mf->compareTo(382500.0))->toBe(Amount::EQUAL);
         expect($mortgage->getMiscellaneousFees()->inclusive()->compareTo($guess_mf))->toBe(Amount::EQUAL);
@@ -408,10 +420,12 @@ it('has configurable contract price', function () {
         expect($guess_partial_mf->compareTo(19125.0))->toBe(Amount::EQUAL);
         expect($mortgage->getPartialMiscellaneousFees()->inclusive()->compareTo($guess_partial_mf))->toBe(Amount::EQUAL);
 
+        //balance payment
         $guess_bp = Money::of($new_tcp * (1-$input_percent_dp), 'PHP');
         expect($guess_bp->compareTo(4275000.0))->toBe(Amount::EQUAL);
         expect($mortgage->getBalancePayment()->inclusive()->compareTo($guess_bp))->toBe(Amount::EQUAL);
 
+        //loan @ 20-year term
         $input_bp_term = 20;
         $mortgage->setBalancePaymentTerm($input_bp_term);
         $guess_loan = $guess_bp->plus($guess_mf->minus($guess_partial_mf));
@@ -428,6 +442,7 @@ it('has configurable contract price', function () {
         expect($guess_income_requirement->compareTo(119870.0))->toBe(Amount::EQUAL);
         expect($mortgage->getIncomeRequirement()->compareTo($guess_income_requirement))->toBe(Amount::EQUAL);
 
+        //loan @ 25-year term
         $input_bp_term = 25;
         $mortgage->setBalancePaymentTerm($input_bp_term);
         expect($mortgage->getLoan()->getTerm()->value)->toBe($input_bp_term);
@@ -439,6 +454,7 @@ it('has configurable contract price', function () {
         expect($guess_income_requirement->compareTo(109276.67))->toBe(Amount::EQUAL);
         expect($mortgage->getIncomeRequirement()->compareTo($guess_income_requirement))->toBe(Amount::EQUAL);
 
+        //loan @ 30-year term
         $input_bp_term = 30;
         $mortgage->setBalancePaymentTerm($input_bp_term);
         expect($mortgage->getLoan()->getTerm()->value)->toBe($input_bp_term);

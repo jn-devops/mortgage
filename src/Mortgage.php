@@ -106,7 +106,6 @@ class Mortgage
     public function getBalancePayment(): Price
     {
         $percent_bp = 1-$this->getPercentDownPayment();
-//        $balance_payment = Money::of(amount: $this->getContractPrice()->inclusive()->multipliedBy($percent_bp), currency: 'PHP', roundingMode: RoundingMode::CEILING);
         $balance_payment = $this->getContractPrice()->inclusive()->multipliedBy($percent_bp);
 
         return new Price($balance_payment);

@@ -70,17 +70,16 @@ trait HasDownPayment
 
     /**
      * @param Payment|float $down_payment
-     * @param int $term
+     * @param int|null $term
      * @return HasDownPayment|Mortgage
+     * @throws MaxCycleBreached
+     * @throws MinTermBreached
      * @throws NumberFormatException
      * @throws RoundingNecessaryException
      * @throws UnknownCurrencyException
-     * @throws MaxCycleBreached
-     * @throws MinTermBreached
      */
     public function setDownPayment(Payment|float $down_payment, int $term = null): self
     {
-//        $term = is_null($term) ? $term : $this->getDownPaymentTerm() ?? 12;
         $term = $term ?: $this->getDownPaymentTerm();
         $this->down_payment = $down_payment instanceof Payment
             ? $down_payment
