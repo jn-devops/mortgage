@@ -18,6 +18,8 @@ trait HasDownPayment
     protected Payment $down_payment;
 
     /**
+     * default is 0%
+     *
      * @return float
      */
     public function getPercentDownPayment(): float
@@ -40,6 +42,8 @@ trait HasDownPayment
     }
 
     /**
+     * default is 0
+     *
      * @return int
      */
     public function getDownPaymentTerm(): int

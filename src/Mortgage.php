@@ -20,7 +20,20 @@ use Homeful\Mortgage\Traits\{HasBorrower, HasCashOuts, HasContractPrice, HasDown
 /**
  * Class Mortgage
  *
- *
+ * @method float getPercentDownPayment()
+ * @method Mortgage setPercentDownPayment(float $percent_down_payment, bool $send = true)
+ * @method float getDownPaymentTerm()
+ * @method Mortgage setDownPaymentTerm(int $down_payment_term, bool $send = true)
+ * @method Payment getDownPayment()
+ * @method Mortgage setDownPayment(Payment|float $down_payment, int $term = null)
+ * @method float getPercentMiscellaneousFees()
+ * @method Mortgage setPercentMiscellaneousFees(float $percent_miscellaneous_fees)
+ * @method Price getMiscellaneousFees()
+ * @method Mortgage setMiscellaneousFees(Price|float $miscellaneous_fees)
+ * @method Price getPartialMiscellaneousFees()
+ * @method Price getBalanceMiscellaneousFees()
+ * @method int getBalancePaymentTerm()
+ * @method Mortgage setBalancePaymentTerm(int $balance_payment_term)
  */
 class Mortgage
 {
@@ -56,6 +69,13 @@ class Mortgage
         $this->update($validated);
     }
 
+    /**
+     * @param array $params
+     * @return $this
+     * @throws \Brick\Math\Exception\NumberFormatException
+     * @throws \Brick\Math\Exception\RoundingNecessaryException
+     * @throws \Brick\Money\Exception\UnknownCurrencyException
+     */
     public function update(array $params): self
     {
         $consulting_fee =  (float) Arr::get($params, Input::CONSULTING_FEE, 0.0);
@@ -79,36 +99,39 @@ class Mortgage
         return $this;
     }
 
-    public function getPartialMiscellaneousFees(): Price
-    {
-        $percent_dp = $this->getPercentDownPayment();
-        $partial_mf = $this->getMiscellaneousFees()->inclusive()->multipliedBy($percent_dp);
-
-        return new Price($partial_mf);
-    }
-
-//    /**
-//     * @return Payment
-//     * @throws \Brick\Math\Exception\NumberFormatException
-//     * @throws \Brick\Math\Exception\RoundingNecessaryException
-//     * @throws \Brick\Money\Exception\UnknownCurrencyException
-//     * @throws \Homeful\Payment\Exceptions\MaxCycleBreached
-//     * @throws \Homeful\Payment\Exceptions\MinTermBreached
-//     */
-//    public function getBalancePayment(): Payment
-//    {
-//        return (new Payment)
-//            ->setPrincipal($this->getLoan())
-//            ->setTerm(new Term($this->getBalancePaymentTerm()))
-//            ->setInterestRate($this->getInterestRate());
-//    }
-
+    /**
+     * balance payment = total contract price - down payment
+     *
+     * @return Price
+     */
     public function getBalancePayment(): Price
     {
-        $percent_bp = 1-$this->getPercentDownPayment();
-        $balance_payment = $this->getContractPrice()->inclusive()->multipliedBy($percent_bp);
+        $down_payment = $this->getDownPayment()->getPrincipal()->inclusive();
+        $balance_payment = $this->getContractPrice()->inclusive()->minus($down_payment);
 
         return new Price($balance_payment);
+    }
+
+    /**
+     * loan principal = balance payment + balance miscellaneous fees
+     * loan term = balance payment term
+     *
+     * @return Payment
+     * @throws \Brick\Math\Exception\NumberFormatException
+     * @throws \Brick\Math\Exception\RoundingNecessaryException
+     * @throws \Brick\Money\Exception\UnknownCurrencyException
+     * @throws \Homeful\Payment\Exceptions\MaxCycleBreached
+     * @throws \Homeful\Payment\Exceptions\MinTermBreached
+     */
+    public function getLoan(): Payment
+    {
+        $balance_mf = $this->getBalanceMiscellaneousFees()->inclusive();
+        $balance_payment = $this->getBalancePayment()->inclusive();
+        $loan = new Price($balance_payment->plus($balance_mf));
+        return (new Payment)
+            ->setPrincipal($loan)
+            ->setTerm(new Term($this->getBalancePaymentTerm()))
+            ->setInterestRate($this->getInterestRate());
     }
 
 //    public function getBalanceCashOut(): Price
@@ -136,24 +159,7 @@ class Mortgage
         return $this->getLowCashOut()->inclusive()->compareTo($deductible_cash_outs) == 1;
     }
 
-    /**
-     * @return Payment
-     * @throws \Brick\Math\Exception\NumberFormatException
-     * @throws \Brick\Math\Exception\RoundingNecessaryException
-     * @throws \Brick\Money\Exception\UnknownCurrencyException
-     * @throws \Homeful\Payment\Exceptions\MaxCycleBreached
-     * @throws \Homeful\Payment\Exceptions\MinTermBreached
-     */
-    public function getLoan(): Payment
-    {
-        $balance_mf = $this->getMiscellaneousFees()->inclusive()->minus($this->getPartialMiscellaneousFees()->inclusive());
-        $balance_payment = $this->getBalancePayment()->inclusive();
-        $loan = new Price($balance_payment->plus($balance_mf));
-        return (new Payment)
-            ->setPrincipal($loan)
-            ->setTerm(new Term($this->getBalancePaymentTerm()))
-            ->setInterestRate($this->getInterestRate());
-    }
+
 
     /**
      * @return Money

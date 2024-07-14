@@ -10,6 +10,8 @@ trait HasTerms
 
 
     /**
+     * default is 0
+     *
      * @return int
      */
     public function getBalancePaymentTerm(): int

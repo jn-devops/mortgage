@@ -62,6 +62,37 @@ trait HasMiscellaneousFees
     }
 
     /**
+     * partial miscellaneous fees = miscellaneous fees x percent down payment
+     *
+     * @return Price
+     * @throws \Brick\Math\Exception\NumberFormatException
+     * @throws \Brick\Math\Exception\RoundingNecessaryException
+     * @throws \Brick\Money\Exception\UnknownCurrencyException
+     */
+    public function getPartialMiscellaneousFees(): Price
+    {
+        $percent_dp = $this->getPercentDownPayment();
+        $partial_mf = $this->getMiscellaneousFees()->inclusive()->multipliedBy($percent_dp);
+
+        return new Price($partial_mf);
+    }
+
+    /**
+     * balance miscellaneous fees = miscellaneous fees - partial miscellaneous fees
+     *
+     * @return Price
+     * @throws \Brick\Math\Exception\NumberFormatException
+     * @throws \Brick\Math\Exception\RoundingNecessaryException
+     * @throws \Brick\Money\Exception\UnknownCurrencyException
+     */
+    public function getBalanceMiscellaneousFees(): Price
+    {
+        $balance_mf = $this->getMiscellaneousFees()->inclusive()->minus($this->getPartialMiscellaneousFees()->inclusive());
+
+        return new Price($balance_mf);
+    }
+
+    /**
      * @return void
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
