@@ -10,3 +10,8 @@ parameters:
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
     checkModelProperties: true
+    ignoreErrors:
+            - '#Call to an undefined method Brick\\Money\\AbstractMoney::multipliedBy#'
+            - '#Call to an undefined method Brick\\Money\\AbstractMoney::plus#'
+            - '#Call to an undefined method Brick\\Money\\AbstractMoney::minus#'
+            - '#Call to an undefined method Brick\\Money\\AbstractMoney::dividedBy#'

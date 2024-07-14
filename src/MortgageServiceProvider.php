@@ -17,7 +17,7 @@ class MortgageServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('mortgage')
-            ->hasConfigFile()
+            ->hasConfigFile(['mortgage', 'payment'])
             ->hasViews()
             ->hasMigration('create_mortgage_table')
             ->hasCommand(MortgageCommand::class);
