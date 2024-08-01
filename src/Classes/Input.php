@@ -14,4 +14,5 @@ class Input
     const DP_TERM = 'down_payment_term';
     const LOW_CASH_OUT = 'low_cash_out';
     const PARTIAL_MISCELLANEOUS_FEES = 'partial_miscellaneous_fees';
+    const DOWN_PAYMENT = 'down_payment';
 }

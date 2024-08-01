@@ -5,4 +5,5 @@ return [
     'max_months_to_pay' => env('MAX_MONTHS_TO_PAY', 24),
     'default_months_to_pay' => env('DEFAULT_EQUITY_MONTHS_TO_PAY', 12),
     'default_interest_rate' => env('DEFAULT_EQUITY_INTEREST_RATE', 0),
+    'default_percent_disposable_income' => env('DEFAULT_PERCENT_DISPOSABLE_INCOME', 0.30), //30%
 ];

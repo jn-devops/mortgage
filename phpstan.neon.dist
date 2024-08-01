@@ -15,3 +15,5 @@ parameters:
             - '#Call to an undefined method Brick\\Money\\AbstractMoney::plus#'
             - '#Call to an undefined method Brick\\Money\\AbstractMoney::minus#'
             - '#Call to an undefined method Brick\\Money\\AbstractMoney::dividedBy#'
+            - '#Call to an undefined static method Whitecube\\Price\\Price::PHP#'
+            - '#Expected parameter of type Brick\\Money\\Money\|float,Brick\\Money\\AbstractMoney provided#'

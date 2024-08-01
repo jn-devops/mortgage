@@ -13,4 +13,9 @@ class Assert
     const DOWN_PAYMENT = 'guess_down_payment_amount';
     const DOWN_PAYMENT_AMORTIZATION = 'guess_dp_amortization_amount';
     const GROSS_MONTHLY_INCOME = 'guess_gross_monthly_income';
+    const INCOME_REQUIREMENT_MULTIPLIER = 'income_requirement_multiplier';
+    const INCOME_REQUIREMENT = 'income_requirement';
+    const JOINT_DISPOSABLE_MONTHLY_INCOME = 'joint_disposable_monthly_income';
+    const MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME = 'maximum_payment_from_monthly_income';
+    const LOAN_DIFFERENCE = 'loan_difference';
 }

@@ -16,7 +16,11 @@ use Homeful\Payment\Class\Term;
 use Whitecube\Price\Modifier;
 use Brick\Math\RoundingMode;
 use Homeful\Mortgage\Classes\Input;
-use Homeful\Mortgage\Traits\{HasBorrower, HasCashOuts, HasContractPrice, HasDownPayment, HasMiscellaneousFees, HasMultipliers, HasPromos, HasProperty,  HasTerms};
+use Homeful\Mortgage\Traits\{HasBorrower, HasCashOuts, HasConfig, HasContractPrice, HasDownPayment, HasMiscellaneousFees, HasMultipliers, HasPromos, HasProperty,  HasTerms};
+use Jarouche\Financial\{PMT, PV};
+use Homeful\Payment\PresentValue;
+use Illuminate\Support\Carbon;
+use Homeful\Mortgage\Actions\CalculateLoanDifference;
 
 /**
  * Class Mortgage
@@ -36,7 +40,7 @@ use Homeful\Mortgage\Traits\{HasBorrower, HasCashOuts, HasContractPrice, HasDown
  * @method int getBalancePaymentTerm()
  * @method Mortgage setBalancePaymentTerm(int $balance_payment_term)
  */
-class Mortgage
+final class Mortgage
 {
     use HasBorrower;
     use HasProperty;
@@ -47,6 +51,7 @@ class Mortgage
     use HasPromos;
     use HasMultipliers;
     use HasDownPayment;
+    use HasConfig;
 
     /**
      * @param Property $property
@@ -99,6 +104,9 @@ class Mortgage
             ->setDownPaymentTerm($dp_term)
             ->setLowCashOut($low_cash_out)
         ;
+
+        $this->addCashOut(new CashOut(name: Input::DOWN_PAYMENT, amount: $this->getDownPayment()->getPrincipal(), deductible: false));
+        $this->addCashOut(new CashOut(name: Input::PARTIAL_MISCELLANEOUS_FEES, amount: $this->getPartialMiscellaneousFees(), deductible: false));
 
         return $this;
     }
@@ -171,33 +179,63 @@ class Mortgage
         return $this->getLowCashOut()->inclusive()->compareTo($deductible_cash_outs) == 1;
     }
 
+    public function getJointBorrowerDisposableMonthlyIncome(): Price
+    {
+        return $this->getBorrower()->getJointMonthlyDisposableIncome($this->property);
+    }
+
+    public function getPresentValueFromMonthlyDisposableIncomePayments(): PresentValue
+    {
+        return (new PresentValue)
+            ->setPayment($this->getJointBorrowerDisposableMonthlyIncome())
+            ->setTerm(new Term($this->getBalancePaymentTerm()))
+            ->setInterestRate($this->getInterestRate());
+    }
+
+    public function getLoanDifference(): Price
+    {
+        return (new CalculateLoanDifference)->get($this->getLoan(), [
+            'payment' => $this->getJointBorrowerDisposableMonthlyIncome(),
+            'term' => new Term($this->getBalancePaymentTerm()),
+            'interest_rate' => $this->getInterestRate()
+        ]);
+    }
+
+    public function getTotalCashOut(): Price
+    {
+        $total_cash_out = new Price(Money::of(0, 'PHP'));
+
+        $this->getCashOuts()->each(function (CashOut $cash_out) use ($total_cash_out) {
+            $total_cash_out->addModifier('cash out item', $cash_out->getAmount()->inclusive());
+        });
+
+        return $total_cash_out;
+    }
+
     /**
-     * @return Money
+     * @param Property $property
+     * @param array $params
+     * @return Mortgage
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
-     * @throws \Homeful\Payment\Exceptions\MaxCycleBreached
-     * @throws \Homeful\Payment\Exceptions\MinTermBreached
+     * @throws \Homeful\Borrower\Exceptions\MaximumBorrowingAgeBreached
+     * @throws \Homeful\Borrower\Exceptions\MinimumBorrowingAgeNotMet
      */
-    public function getIncomeRequirement(): Money
+    public static function createWithTypicalBorrower(Property $property, array $params): Mortgage
     {
-        $multiplier = $this->property->getDefaultDisposableIncomeRequirementMultiplier();
+        $tcp = ($property->getTotalContractPrice()->inclusive()->getAmount()->toFloat() * (1.085)) *.95;
 
-        return $this->getLoan()->getMonthlyAmortization()->inclusive()->dividedBy(that: $multiplier, roundingMode: RoundingMode::CEILING);
+        $disposable_income_requirement = (new Payment)
+            ->setPrincipal($tcp)->setTerm(self::getDefaultLoanTerm())->setInterestRate(self::getDefaultInterestRate())
+            ->getMonthlyAmortization()->addModifier('gmi', function ($modifier) use ($property) {
+                $modifier->divide($property->getDisposableIncomeRequirementMultiplier());
+            })->inclusive();
+
+        $disposable_income_requirement = $disposable_income_requirement instanceof Money ? $disposable_income_requirement : null;
+        $birthdate_from_default_age = Carbon::now()->addYears(-1 * self::getDefaultAge());
+        $borrower = (new Borrower)->setGrossMonthlyIncome($disposable_income_requirement)->setBirthdate($birthdate_from_default_age);
+
+        return new self($property, $borrower, $params);
     }
-
-//    /**
-//     * @return Price
-//     */
-//    public function getLoan(): Price
-//    {
-//        $percent_bp = 1 - $this->getPercentDownPayment();
-//        $tcp = new Price($this->getContractPrice()->base());
-//
-//        return $tcp->addModifier('balance', function (Modifier $modifier) use ($percent_bp) {
-//            $this->isPromotional()
-//                ? $modifier->multiply($percent_bp)->add($this->getMiscellaneousFees()->base())
-//                : $modifier->add($this->getMiscellaneousFees()->base())->multiply($percent_bp);
-//        });
-//    }
 }
