@@ -8,11 +8,8 @@ trait HasTerms
 {
     protected int $balance_payment_term;
 
-
     /**
      * default is 0
-     *
-     * @return int
      */
     public function getBalancePaymentTerm(): int
     {
@@ -20,7 +17,6 @@ trait HasTerms
     }
 
     /**
-     * @param int $balance_payment_term
      * @return HasTerms|Mortgage
      */
     public function setBalancePaymentTerm(int $balance_payment_term): self

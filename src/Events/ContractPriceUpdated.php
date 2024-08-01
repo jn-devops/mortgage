@@ -1,4 +1,5 @@
 <?php
 
 namespace Homeful\Mortgage\Events;
-class ContractPriceUpdated extends MortgageUpdated{}
+
+class ContractPriceUpdated extends MortgageUpdated {}

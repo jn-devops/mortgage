@@ -2,4 +2,4 @@
 
 namespace Homeful\Mortgage\Events;
 
-class PercentMiscellaneousFeesUpdated extends MortgageUpdated{}
+class PercentMiscellaneousFeesUpdated extends MortgageUpdated {}

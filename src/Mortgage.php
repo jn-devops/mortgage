@@ -4,23 +4,27 @@ namespace Homeful\Mortgage;
 
 use Brick\Money\Money;
 use Homeful\Borrower\Borrower;
-use Homeful\Mortgage\Classes\CashOut;
-use Homeful\Payment\Enums\Cycle;
-use Homeful\Property\Property;
-use Illuminate\Support\Collection;
-use Whitecube\Price\Price;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Arr;
-use Homeful\Payment\Payment;
-use Homeful\Payment\Class\Term;
-use Whitecube\Price\Modifier;
-use Brick\Math\RoundingMode;
-use Homeful\Mortgage\Classes\Input;
-use Homeful\Mortgage\Traits\{HasBorrower, HasCashOuts, HasConfig, HasContractPrice, HasDownPayment, HasMiscellaneousFees, HasMultipliers, HasPromos, HasProperty,  HasTerms};
-use Jarouche\Financial\{PMT, PV};
-use Homeful\Payment\PresentValue;
-use Illuminate\Support\Carbon;
 use Homeful\Mortgage\Actions\CalculateLoanDifference;
+use Homeful\Mortgage\Classes\CashOut;
+use Homeful\Mortgage\Classes\Input;
+use Homeful\Mortgage\Traits\HasBorrower;
+use Homeful\Mortgage\Traits\HasCashOuts;
+use Homeful\Mortgage\Traits\HasConfig;
+use Homeful\Mortgage\Traits\HasContractPrice;
+use Homeful\Mortgage\Traits\HasDownPayment;
+use Homeful\Mortgage\Traits\HasMiscellaneousFees;
+use Homeful\Mortgage\Traits\HasMultipliers;
+use Homeful\Mortgage\Traits\HasPromos;
+use Homeful\Mortgage\Traits\HasProperty;
+use Homeful\Mortgage\Traits\HasTerms;
+use Homeful\Payment\Class\Term;
+use Homeful\Payment\Payment;
+use Homeful\Payment\PresentValue;
+use Homeful\Property\Property;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Whitecube\Price\Price;
 
 /**
  * Class Mortgage
@@ -43,20 +47,17 @@ use Homeful\Mortgage\Actions\CalculateLoanDifference;
 final class Mortgage
 {
     use HasBorrower;
-    use HasProperty;
     use HasCashOuts;
-    use HasContractPrice;
-    use HasMiscellaneousFees;
-    use HasTerms;
-    use HasPromos;
-    use HasMultipliers;
-    use HasDownPayment;
     use HasConfig;
+    use HasContractPrice;
+    use HasDownPayment;
+    use HasMiscellaneousFees;
+    use HasMultipliers;
+    use HasPromos;
+    use HasProperty;
+    use HasTerms;
 
     /**
-     * @param Property $property
-     * @param Borrower $borrower
-     * @param array $params
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
@@ -79,19 +80,19 @@ final class Mortgage
     }
 
     /**
-     * @param array $params
      * @return $this
+     *
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
      */
     public function update(array $params): self
     {
-        $consulting_fee =  (float) Arr::get($params, Input::CONSULTING_FEE, 0.0);
-        $dp_percent =  (float) Arr::get($params, Input::PERCENT_DP, 0.0);
+        $consulting_fee = (float) Arr::get($params, Input::CONSULTING_FEE, 0.0);
+        $dp_percent = (float) Arr::get($params, Input::PERCENT_DP, 0.0);
         $bp_term = (int) Arr::get($params, Input::BP_TERM, 1);
         $bp_interest_rate = (float) Arr::get($params, Input::BP_INTEREST_RATE, 0.0);
-        $mf_percent =  (float) Arr::get($params, Input::PERCENT_MF, 0.0);
+        $mf_percent = (float) Arr::get($params, Input::PERCENT_MF, 0.0);
         $dp_term = (int) Arr::get($params, Input::DP_TERM, 1);
         $low_cash_out = (float) Arr::get($params, Input::LOW_CASH_OUT, 0.0);
 
@@ -102,8 +103,7 @@ final class Mortgage
             ->setInterestRate($bp_interest_rate)
             ->setPercentMiscellaneousFees($mf_percent)
             ->setDownPaymentTerm($dp_term)
-            ->setLowCashOut($low_cash_out)
-        ;
+            ->setLowCashOut($low_cash_out);
 
         $this->addCashOut(new CashOut(name: Input::DOWN_PAYMENT, amount: $this->getDownPayment()->getPrincipal(), deductible: false));
         $this->addCashOut(new CashOut(name: Input::PARTIAL_MISCELLANEOUS_FEES, amount: $this->getPartialMiscellaneousFees(), deductible: false));
@@ -113,8 +113,6 @@ final class Mortgage
 
     /**
      * balance payment = total contract price - down payment
-     *
-     * @return Price
      */
     public function getBalancePayment(): Price
     {
@@ -128,7 +126,6 @@ final class Mortgage
      * loan principal = balance payment + balance miscellaneous fees
      * loan term = balance payment term
      *
-     * @return Payment
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
@@ -140,30 +137,30 @@ final class Mortgage
         $balance_mf = $this->getBalanceMiscellaneousFees()->inclusive();
         $balance_payment = $this->getBalancePayment()->inclusive();
         $loan = new Price($balance_payment->plus($balance_mf));
+
         return (new Payment)
             ->setPrincipal($loan)
             ->setTerm(new Term($this->getBalancePaymentTerm()))
             ->setInterestRate($this->getInterestRate());
     }
 
-//    public function getBalanceCashOut(): Price
-//    {
-//        $amount = Money::of(0, 'PHP');
-//        if ($this->low_cash_out instanceof Price) {
-//            $low_cash_out = $this->low_cash_out->inclusive();
-//            if ($low_cash_out->compareTo(0) == 1) {
-//                $deductible_cash_outs = $this->getCashOuts()->sum(function(CashOut $cash_out) {
-//                    return $cash_out->getAmount()->inclusive()->getAmount()->toFloat();
-//                });
-//                $amount = $low_cash_out->minus($deductible_cash_outs);
-//            }
-//        }
-//
-//        return new Price($amount);
-//    }
+    //    public function getBalanceCashOut(): Price
+    //    {
+    //        $amount = Money::of(0, 'PHP');
+    //        if ($this->low_cash_out instanceof Price) {
+    //            $low_cash_out = $this->low_cash_out->inclusive();
+    //            if ($low_cash_out->compareTo(0) == 1) {
+    //                $deductible_cash_outs = $this->getCashOuts()->sum(function(CashOut $cash_out) {
+    //                    return $cash_out->getAmount()->inclusive()->getAmount()->toFloat();
+    //                });
+    //                $amount = $low_cash_out->minus($deductible_cash_outs);
+    //            }
+    //        }
+    //
+    //        return new Price($amount);
+    //    }
 
     /**
-     * @return bool
      * @throws \Brick\Math\Exception\MathException
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
@@ -172,7 +169,7 @@ final class Mortgage
      */
     public function isPromotional(): bool
     {
-        $deductible_cash_outs = $this->getCashOuts()->sum(function(CashOut $cash_out) {
+        $deductible_cash_outs = $this->getCashOuts()->sum(function (CashOut $cash_out) {
             return $cash_out->getAmount()->inclusive()->getAmount()->toFloat();
         });
 
@@ -197,7 +194,7 @@ final class Mortgage
         return (new CalculateLoanDifference)->get($this->getLoan(), [
             'payment' => $this->getJointBorrowerDisposableMonthlyIncome(),
             'term' => new Term($this->getBalancePaymentTerm()),
-            'interest_rate' => $this->getInterestRate()
+            'interest_rate' => $this->getInterestRate(),
         ]);
     }
 
@@ -213,9 +210,6 @@ final class Mortgage
     }
 
     /**
-     * @param Property $property
-     * @param array $params
-     * @return Mortgage
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
@@ -224,7 +218,7 @@ final class Mortgage
      */
     public static function createWithTypicalBorrower(Property $property, array $params): Mortgage
     {
-        $tcp = ($property->getTotalContractPrice()->inclusive()->getAmount()->toFloat() * (1.085)) *.95;
+        $tcp = ($property->getTotalContractPrice()->inclusive()->getAmount()->toFloat() * (1.085)) * .95;
 
         $disposable_income_requirement = (new Payment)
             ->setPrincipal($tcp)->setTerm(self::getDefaultLoanTerm())->setInterestRate(self::getDefaultInterestRate())

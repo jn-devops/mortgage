@@ -3,8 +3,8 @@
 namespace Homeful\Mortgage\Data;
 
 use Homeful\Borrower\Data\BorrowerData;
-use Homeful\Property\Data\PropertyData;
 use Homeful\Mortgage\Mortgage;
+use Homeful\Property\Data\PropertyData;
 use Spatie\LaravelData\Data;
 
 class MortgageData extends Data
@@ -29,11 +29,12 @@ class MortgageData extends Data
         public float $income_requirement,
         public float $present_value_from_monthly_disposable_income,
         public float $loan_difference,
-    ){}
+    ) {}
 
     public static function fromObject(Mortgage $mortgage): MortgageData
     {
         $loan = $mortgage->getLoan();
+
         return new self(
             borrower: BorrowerData::fromObject($mortgage->getBorrower()),
             property: PropertyData::fromObject($mortgage->getProperty()),

@@ -2,12 +2,12 @@
 
 namespace Homeful\Mortgage\Traits;
 
+use Brick\Money\Money;
 use Homeful\Mortgage\Classes\CashOut;
 use Homeful\Mortgage\Classes\Input;
-use Illuminate\Support\Collection;
 use Homeful\Mortgage\Mortgage;
+use Illuminate\Support\Collection;
 use Whitecube\Price\Price;
-use Brick\Money\Money;
 
 trait HasCashOuts
 {
@@ -23,16 +23,12 @@ trait HasCashOuts
         return $this;
     }
 
-    /**
-     * @return Collection
-     */
     public function getCashOuts(): Collection
     {
         return $this->cashOuts;
     }
 
     /**
-     * @param Collection $cashOuts
      * @return HasCashOuts|Mortgage
      */
     public function setCashOuts(Collection $cashOuts): self
@@ -43,7 +39,6 @@ trait HasCashOuts
     }
 
     /**
-     * @param CashOut $cashOut
      * @return HasCashOuts|Mortgage
      */
     public function addCashOut(CashOut $cashOut): self
@@ -54,7 +49,6 @@ trait HasCashOuts
     }
 
     /**
-     * @return Price
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
@@ -69,13 +63,14 @@ trait HasCashOuts
     }
 
     /**
-     * @param Price|float $consulting_fee
      * @return Mortgage|HasCashOuts
      */
     public function setConsultingFee(Price|float $consulting_fee): self
     {
         $value = $consulting_fee instanceof Price ? $consulting_fee->inclusive()->getAmount()->toFloat() : $consulting_fee;
-        if ($value > 0.0) $this->addCashOut(new CashOut(name: Input::CONSULTING_FEE, amount: $consulting_fee, deductible: true));
+        if ($value > 0.0) {
+            $this->addCashOut(new CashOut(name: Input::CONSULTING_FEE, amount: $consulting_fee, deductible: true));
+        }
 
         return $this;
     }

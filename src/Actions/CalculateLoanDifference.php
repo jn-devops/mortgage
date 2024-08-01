@@ -3,17 +3,14 @@
 namespace Homeful\Mortgage\Actions;
 
 use Brick\Math\RoundingMode;
-use Homeful\Payment\{Payment, PresentValue};
-use Whitecube\Price\Price;
+use Homeful\Payment\Payment;
+use Homeful\Payment\PresentValue;
 use Illuminate\Support\Facades\Validator;
-
+use Whitecube\Price\Price;
 
 class CalculateLoanDifference
 {
     /**
-     * @param Payment $loan
-     * @param array $attributes
-     * @return Price
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
@@ -23,7 +20,7 @@ class CalculateLoanDifference
         $validated = Validator::validate($attributes, [
             'payment' => 'required',
             'term' => 'required',
-            'interest_rate' => 'required'
+            'interest_rate' => 'required',
         ]);
 
         $present_value = (new PresentValue)->setPayment($validated['payment'])->setTerm($validated['term'])->setInterestRate($validated['interest_rate']);

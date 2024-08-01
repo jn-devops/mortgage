@@ -2,20 +2,19 @@
 
 namespace Homeful\Mortgage\Classes;
 
-use Amp\ByteStream\Pipe;
 use Brick\Money\Money;
 use Whitecube\Price\Price;
 
 class CashOut
 {
     protected string $name;
+
     protected Price $amount;
+
     protected bool $deductible;
 
     /**
-     * @param string $name
-     * @param Price $amount
-     * @param bool $deductible
+     * @param  Price  $amount
      */
     public function __construct(string $name, Price|float $amount, bool $deductible)
     {

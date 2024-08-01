@@ -2,26 +2,24 @@
 
 namespace Homeful\Mortgage\Traits;
 
-use Homeful\Mortgage\Events\{MiscellaneousFeesUpdated, PercentMiscellaneousFeesUpdated};
+use Brick\Money\Money;
+use Homeful\Mortgage\Events\MiscellaneousFeesUpdated;
+use Homeful\Mortgage\Events\PercentMiscellaneousFeesUpdated;
 use Homeful\Mortgage\Mortgage;
 use Whitecube\Price\Price;
-use Brick\Money\Money;
 
 trait HasMiscellaneousFees
 {
     protected float $percent_miscellaneous_fees;
+
     protected Price $miscellaneous_fees;
 
-    /**
-     * @return float
-     */
     public function getPercentMiscellaneousFees(): float
     {
         return $this->percent_miscellaneous_fees ?? 0.0;
     }
 
     /**
-     * @param float $percent_miscellaneous_fees
      * @return Mortgage|HasMiscellaneousFees
      */
     public function setPercentMiscellaneousFees(float $percent_miscellaneous_fees): self
@@ -33,7 +31,6 @@ trait HasMiscellaneousFees
     }
 
     /**
-     * @return Price
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
@@ -44,8 +41,8 @@ trait HasMiscellaneousFees
     }
 
     /**
-     * @param Price|float $miscellaneous_fees
      * @return Mortgage|HasMiscellaneousFees
+     *
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
@@ -64,7 +61,6 @@ trait HasMiscellaneousFees
     /**
      * partial miscellaneous fees = miscellaneous fees x percent down payment
      *
-     * @return Price
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
@@ -80,7 +76,6 @@ trait HasMiscellaneousFees
     /**
      * balance miscellaneous fees = miscellaneous fees - partial miscellaneous fees
      *
-     * @return Price
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
@@ -93,7 +88,6 @@ trait HasMiscellaneousFees
     }
 
     /**
-     * @return void
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
@@ -103,6 +97,6 @@ trait HasMiscellaneousFees
         $float_miscellaneous_fees = $this->getMiscellaneousFees()->inclusive()->getAmount()->toFloat();
         $float_contract_price = $this->getContractPrice()->inclusive()->getAmount()->toFloat();
 
-        $this->percent_miscellaneous_fees = $float_miscellaneous_fees/$float_contract_price;
+        $this->percent_miscellaneous_fees = $float_miscellaneous_fees / $float_contract_price;
     }
 }

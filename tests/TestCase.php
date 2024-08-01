@@ -2,10 +2,10 @@
 
 namespace Homeful\Mortgage\Tests;
 
+use Homeful\Mortgage\MortgageServiceProvider;
 use Homeful\Mortgage\Providers\EventServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Homeful\Mortgage\MortgageServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -22,7 +22,7 @@ class TestCase extends Orchestra
     {
         return [
             MortgageServiceProvider::class,
-            EventServiceProvider::class
+            EventServiceProvider::class,
         ];
     }
 

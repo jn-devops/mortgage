@@ -2,9 +2,9 @@
 
 namespace Homeful\Mortgage;
 
+use Homeful\Mortgage\Commands\MortgageCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Homeful\Mortgage\Commands\MortgageCommand;
 
 class MortgageServiceProvider extends PackageServiceProvider
 {

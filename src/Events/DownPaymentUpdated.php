@@ -2,4 +2,4 @@
 
 namespace Homeful\Mortgage\Events;
 
-class DownPaymentUpdated extends MortgageUpdated{}
+class DownPaymentUpdated extends MortgageUpdated {}

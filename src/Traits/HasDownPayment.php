@@ -2,25 +2,29 @@
 
 namespace Homeful\Mortgage\Traits;
 
-use Homeful\Mortgage\Events\{DownPaymentUpdated, MortgageTermUpdated, PercentDownPaymentUpdated};
-use Brick\Math\Exception\{NumberFormatException, RoundingNecessaryException};
-use Homeful\Payment\Exceptions\{MaxCycleBreached, MinTermBreached};
+use Brick\Math\Exception\NumberFormatException;
+use Brick\Math\Exception\RoundingNecessaryException;
 use Brick\Money\Exception\UnknownCurrencyException;
-use Homeful\Payment\Enums\Cycle;
-use Homeful\Payment\Class\Term;
+use Homeful\Mortgage\Events\DownPaymentUpdated;
+use Homeful\Mortgage\Events\MortgageTermUpdated;
+use Homeful\Mortgage\Events\PercentDownPaymentUpdated;
 use Homeful\Mortgage\Mortgage;
+use Homeful\Payment\Class\Term;
+use Homeful\Payment\Enums\Cycle;
+use Homeful\Payment\Exceptions\MaxCycleBreached;
+use Homeful\Payment\Exceptions\MinTermBreached;
 use Homeful\Payment\Payment;
 
 trait HasDownPayment
 {
     protected float $percent_down_payment;
+
     protected int $down_payment_term;
+
     protected Payment $down_payment;
 
     /**
      * default is 0%
-     *
-     * @return float
      */
     public function getPercentDownPayment(): float
     {
@@ -28,8 +32,6 @@ trait HasDownPayment
     }
 
     /**
-     * @param float $percent_down_payment
-     * @param bool $send
      * @return Mortgage|HasMultipliers
      */
     public function setPercentDownPayment(float $percent_down_payment, bool $send = true): self
@@ -43,8 +45,6 @@ trait HasDownPayment
 
     /**
      * default is 0
-     *
-     * @return int
      */
     public function getDownPaymentTerm(): int
     {
@@ -52,8 +52,6 @@ trait HasDownPayment
     }
 
     /**
-     * @param int $down_payment_term
-     * @param bool $send
      * @return HasTerms|Mortgage
      */
     public function setDownPaymentTerm(int $down_payment_term, bool $send = true): self
@@ -64,25 +62,21 @@ trait HasDownPayment
         return $this;
     }
 
-    /**
-     * @return Payment
-     */
     public function getDownPayment(): Payment
     {
         return $this->down_payment;
     }
 
     /**
-     * @param Payment|float $down_payment
-     * @param int|null $term
      * @return HasDownPayment|Mortgage
+     *
      * @throws MaxCycleBreached
      * @throws MinTermBreached
      * @throws NumberFormatException
      * @throws RoundingNecessaryException
      * @throws UnknownCurrencyException
      */
-    public function setDownPayment(Payment|float $down_payment, int $term = null): self
+    public function setDownPayment(Payment|float $down_payment, ?int $term = null): self
     {
         $term = $term ?: $this->getDownPaymentTerm();
         $this->down_payment = $down_payment instanceof Payment

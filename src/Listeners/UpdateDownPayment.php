@@ -2,14 +2,12 @@
 
 namespace Homeful\Mortgage\Listeners;
 
-use Homeful\Mortgage\Events\MortgageUpdated;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use Homeful\Mortgage\Classes\CashOut;
-use Homeful\Payment\Enums\Cycle;
-use Homeful\Payment\Class\Term;
-use Homeful\Mortgage\Mortgage;
 use Brick\Math\RoundingMode;
+use Homeful\Mortgage\Classes\CashOut;
+use Homeful\Mortgage\Events\MortgageUpdated;
+use Homeful\Mortgage\Mortgage;
+use Homeful\Payment\Class\Term;
+use Homeful\Payment\Enums\Cycle;
 use Homeful\Payment\Payment;
 
 class UpdateDownPayment
@@ -23,8 +21,6 @@ class UpdateDownPayment
     }
 
     /**
-     * @param MortgageUpdated $event
-     * @return void
      * @throws \Brick\Math\Exception\NumberFormatException
      * @throws \Brick\Math\Exception\RoundingNecessaryException
      * @throws \Brick\Money\Exception\UnknownCurrencyException
@@ -36,9 +32,9 @@ class UpdateDownPayment
         with($event->mortgage, function (Mortgage $mortgage) {
             $percent_dp = $mortgage->getPercentDownPayment();
             $partial_tcp = $mortgage->getContractPrice()->inclusive()->multipliedBy($percent_dp, roundingMode: RoundingMode::CEILING)->getAmount()->toFloat();
-//            $deductible_cash_outs = $mortgage->getCashOuts()->sum(function(CashOut $cash_out) {
-//                return $cash_out->getAmount()->inclusive()->getAmount()->toFloat();
-//            });
+            //            $deductible_cash_outs = $mortgage->getCashOuts()->sum(function(CashOut $cash_out) {
+            //                return $cash_out->getAmount()->inclusive()->getAmount()->toFloat();
+            //            });
             $deductible_cash_outs = 0;
             $dp = $mortgage->isPromotional() ? 0.0 : $partial_tcp - $deductible_cash_outs;
             $down_payment = (new Payment)
