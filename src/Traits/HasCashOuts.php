@@ -4,7 +4,7 @@ namespace Homeful\Mortgage\Traits;
 
 use Brick\Money\Money;
 use Homeful\Mortgage\Classes\CashOut;
-use Homeful\Mortgage\Classes\Input;
+use Homeful\Common\Classes\Input;
 use Homeful\Mortgage\Mortgage;
 use Illuminate\Support\Collection;
 use Whitecube\Price\Price;
