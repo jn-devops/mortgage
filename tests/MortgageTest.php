@@ -3,9 +3,9 @@
 use Brick\Math\RoundingMode;
 use Brick\Money\Money;
 use Homeful\Borrower\Borrower;
-use Homeful\Mortgage\Classes\Amount;
 use Homeful\Common\Classes\Assert;
 use Homeful\Common\Classes\Input;
+use Homeful\Mortgage\Classes\Amount;
 use Homeful\Mortgage\Classes\CashOut;
 use Homeful\Mortgage\Data\MortgageData;
 use Homeful\Mortgage\Mortgage;

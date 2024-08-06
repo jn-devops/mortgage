@@ -4,9 +4,9 @@ namespace Homeful\Mortgage;
 
 use Brick\Money\Money;
 use Homeful\Borrower\Borrower;
+use Homeful\Common\Classes\Input;
 use Homeful\Mortgage\Actions\CalculateLoanDifference;
 use Homeful\Mortgage\Classes\CashOut;
-use Homeful\Common\Classes\Input;
 use Homeful\Mortgage\Traits\HasBorrower;
 use Homeful\Mortgage\Traits\HasCashOuts;
 use Homeful\Mortgage\Traits\HasConfig;
