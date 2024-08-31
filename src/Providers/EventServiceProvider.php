@@ -2,15 +2,15 @@
 
 namespace Homeful\Mortgage\Providers;
 
-use Homeful\Mortgage\Events\ContractPriceUpdated;
-use Homeful\Mortgage\Events\DownPaymentUpdated;
-use Homeful\Mortgage\Events\MortgageTermUpdated;
-use Homeful\Mortgage\Events\PercentDownPaymentUpdated;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Homeful\Mortgage\Events\PercentMiscellaneousFeesUpdated;
-use Homeful\Mortgage\Listeners\UpdateDownPayment;
 use Homeful\Mortgage\Listeners\UpdateDownPaymentProperties;
 use Homeful\Mortgage\Listeners\UpdateMiscellaneousFees;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Homeful\Mortgage\Events\PercentDownPaymentUpdated;
+use Homeful\Mortgage\Listeners\UpdateDownPayment;
+use Homeful\Mortgage\Events\ContractPriceUpdated;
+use Homeful\Mortgage\Events\MortgageTermUpdated;
+use Homeful\Mortgage\Events\DownPaymentUpdated;
 use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider

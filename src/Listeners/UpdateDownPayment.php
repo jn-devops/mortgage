@@ -2,12 +2,11 @@
 
 namespace Homeful\Mortgage\Listeners;
 
-use Brick\Math\RoundingMode;
-use Homeful\Mortgage\Classes\CashOut;
 use Homeful\Mortgage\Events\MortgageUpdated;
-use Homeful\Mortgage\Mortgage;
-use Homeful\Payment\Class\Term;
 use Homeful\Payment\Enums\Cycle;
+use Homeful\Payment\Class\Term;
+use Homeful\Mortgage\Mortgage;
+use Brick\Math\RoundingMode;
 use Homeful\Payment\Payment;
 
 class UpdateDownPayment

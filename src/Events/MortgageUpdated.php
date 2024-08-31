@@ -2,11 +2,11 @@
 
 namespace Homeful\Mortgage\Events;
 
-use Homeful\Mortgage\Mortgage;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Queue\SerializesModels;
+use Homeful\Mortgage\Mortgage;
 
 abstract class MortgageUpdated
 {

@@ -2,8 +2,8 @@
 
 namespace Homeful\Mortgage\Classes;
 
-use Brick\Money\Money;
 use Whitecube\Price\Price;
+use Brick\Money\Money;
 
 class CashOut
 {

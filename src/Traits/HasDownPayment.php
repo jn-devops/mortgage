@@ -2,17 +2,17 @@
 
 namespace Homeful\Mortgage\Traits;
 
-use Brick\Math\Exception\NumberFormatException;
+use Homeful\Mortgage\Events\PercentDownPaymentUpdated;
 use Brick\Math\Exception\RoundingNecessaryException;
 use Brick\Money\Exception\UnknownCurrencyException;
-use Homeful\Mortgage\Events\DownPaymentUpdated;
 use Homeful\Mortgage\Events\MortgageTermUpdated;
-use Homeful\Mortgage\Events\PercentDownPaymentUpdated;
-use Homeful\Mortgage\Mortgage;
-use Homeful\Payment\Class\Term;
-use Homeful\Payment\Enums\Cycle;
 use Homeful\Payment\Exceptions\MaxCycleBreached;
+use Brick\Math\Exception\NumberFormatException;
+use Homeful\Mortgage\Events\DownPaymentUpdated;
 use Homeful\Payment\Exceptions\MinTermBreached;
+use Homeful\Payment\Enums\Cycle;
+use Homeful\Payment\Class\Term;
+use Homeful\Mortgage\Mortgage;
 use Homeful\Payment\Payment;
 
 trait HasDownPayment

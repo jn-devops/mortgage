@@ -2,11 +2,11 @@
 
 namespace Homeful\Mortgage\Traits;
 
-use Brick\Money\Money;
-use Homeful\Mortgage\Events\MiscellaneousFeesUpdated;
 use Homeful\Mortgage\Events\PercentMiscellaneousFeesUpdated;
+use Homeful\Mortgage\Events\MiscellaneousFeesUpdated;
 use Homeful\Mortgage\Mortgage;
 use Whitecube\Price\Price;
+use Brick\Money\Money;
 
 trait HasMiscellaneousFees
 {

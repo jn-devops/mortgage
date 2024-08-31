@@ -2,10 +2,10 @@
 
 namespace Homeful\Mortgage\Listeners;
 
-use Brick\Money\Money;
 use Homeful\Mortgage\Events\MortgageUpdated;
 use Homeful\Mortgage\Mortgage;
 use Whitecube\Price\Price;
+use Brick\Money\Money;
 
 class UpdateMiscellaneousFees
 {

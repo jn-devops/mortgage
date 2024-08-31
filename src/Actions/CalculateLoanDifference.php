@@ -2,10 +2,10 @@
 
 namespace Homeful\Mortgage\Actions;
 
+use Illuminate\Support\Facades\Validator;
+use Homeful\Payment\PresentValue;
 use Brick\Math\RoundingMode;
 use Homeful\Payment\Payment;
-use Homeful\Payment\PresentValue;
-use Illuminate\Support\Facades\Validator;
 use Whitecube\Price\Price;
 
 class CalculateLoanDifference

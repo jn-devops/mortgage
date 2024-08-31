@@ -2,13 +2,13 @@
 
 namespace Homeful\Mortgage\Traits;
 
-use Brick\Math\Exception\NumberFormatException;
 use Brick\Math\Exception\RoundingNecessaryException;
 use Brick\Money\Exception\UnknownCurrencyException;
-use Brick\Money\Money;
 use Homeful\Mortgage\Events\ContractPriceUpdated;
+use Brick\Math\Exception\NumberFormatException;
 use Homeful\Mortgage\Mortgage;
 use Whitecube\Price\Price;
+use Brick\Money\Money;
 
 trait HasContractPrice
 {
@@ -20,6 +20,8 @@ trait HasContractPrice
     }
 
     /**
+     * @param Price|float $contract_price
+     * @param bool $send
      * @return Mortgage|HasContractPrice
      *
      * @throws NumberFormatException

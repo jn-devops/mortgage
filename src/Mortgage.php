@@ -2,29 +2,29 @@
 
 namespace Homeful\Mortgage;
 
-use Brick\Money\Money;
-use Homeful\Borrower\Borrower;
-use Homeful\Common\Classes\Input;
 use Homeful\Mortgage\Actions\CalculateLoanDifference;
-use Homeful\Mortgage\Classes\CashOut;
+use Homeful\Mortgage\Traits\HasMiscellaneousFees;
+use Homeful\Mortgage\Traits\HasContractPrice;
+use Homeful\Mortgage\Traits\HasDownPayment;
+use Homeful\Mortgage\Traits\HasMultipliers;
+use Illuminate\Support\Facades\Validator;
+use Homeful\Mortgage\Traits\HasProperty;
 use Homeful\Mortgage\Traits\HasBorrower;
 use Homeful\Mortgage\Traits\HasCashOuts;
 use Homeful\Mortgage\Traits\HasConfig;
-use Homeful\Mortgage\Traits\HasContractPrice;
-use Homeful\Mortgage\Traits\HasDownPayment;
-use Homeful\Mortgage\Traits\HasMiscellaneousFees;
-use Homeful\Mortgage\Traits\HasMultipliers;
 use Homeful\Mortgage\Traits\HasPromos;
-use Homeful\Mortgage\Traits\HasProperty;
+use Homeful\Mortgage\Classes\CashOut;
 use Homeful\Mortgage\Traits\HasTerms;
-use Homeful\Payment\Class\Term;
-use Homeful\Payment\Payment;
 use Homeful\Payment\PresentValue;
+use Homeful\Common\Classes\Input;
+use Homeful\Payment\Class\Term;
 use Homeful\Property\Property;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Validator;
+use Homeful\Borrower\Borrower;
+use Homeful\Payment\Payment;
+use Illuminate\Support\Arr;
 use Whitecube\Price\Price;
+use Brick\Money\Money;
 
 /**
  * Class Mortgage

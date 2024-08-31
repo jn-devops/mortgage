@@ -2,9 +2,9 @@
 
 namespace Homeful\Mortgage;
 
+use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Homeful\Mortgage\Commands\MortgageCommand;
 use Spatie\LaravelPackageTools\Package;
-use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class MortgageServiceProvider extends PackageServiceProvider
 {
@@ -18,8 +18,6 @@ class MortgageServiceProvider extends PackageServiceProvider
         $package
             ->name('mortgage')
             ->hasConfigFile(['mortgage', 'payment'])
-            ->hasViews()
-            ->hasMigration('create_mortgage_table')
             ->hasCommand(MortgageCommand::class);
     }
 }

@@ -15,6 +15,7 @@ trait HasProperty
     }
 
     /**
+     * @param Property $property
      * @return Mortgage|HasProperty
      */
     public function setProperty(Property $property): self

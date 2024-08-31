@@ -2,12 +2,12 @@
 
 namespace Homeful\Mortgage\Traits;
 
-use Brick\Money\Money;
-use Homeful\Common\Classes\Input;
 use Homeful\Mortgage\Classes\CashOut;
-use Homeful\Mortgage\Mortgage;
 use Illuminate\Support\Collection;
+use Homeful\Common\Classes\Input;
+use Homeful\Mortgage\Mortgage;
 use Whitecube\Price\Price;
+use Brick\Money\Money;
 
 trait HasCashOuts
 {

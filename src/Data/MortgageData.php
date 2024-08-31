@@ -3,8 +3,8 @@
 namespace Homeful\Mortgage\Data;
 
 use Homeful\Borrower\Data\BorrowerData;
-use Homeful\Mortgage\Mortgage;
 use Homeful\Property\Data\PropertyData;
+use Homeful\Mortgage\Mortgage;
 use Spatie\LaravelData\Data;
 
 class MortgageData extends Data
