@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.0.3 - 2024-09-08
+
+add property to config
+
 ## #v1.0.2 - 2024-08-31
 
 fix styling
