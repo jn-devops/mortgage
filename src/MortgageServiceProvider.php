@@ -17,7 +17,7 @@ class MortgageServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('mortgage')
-            ->hasConfigFile(['mortgage', 'payment'])
+            ->hasConfigFile(['mortgage', 'payment', 'property'])
             ->hasCommand(MortgageCommand::class);
     }
 }

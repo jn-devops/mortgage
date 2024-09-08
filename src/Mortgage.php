@@ -141,7 +141,9 @@ final class Mortgage
         return (new Payment)
             ->setPrincipal($loan)
             ->setTerm(new Term($this->getBalancePaymentTerm()))
-            ->setInterestRate($this->getInterestRate());
+            ->setInterestRate($this->getInterestRate())
+            ->setPercentDisposableIncomeRequirement($this->getProperty()->getDisposableIncomeRequirementMultiplier())
+            ;
     }
 
     //    public function getBalanceCashOut(): Price

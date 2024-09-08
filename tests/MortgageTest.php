@@ -1,159 +1,24 @@
 <?php
 
-use Brick\Math\RoundingMode;
-use Brick\Money\Money;
-use Homeful\Borrower\Borrower;
+use Homeful\Property\Enums\MarketSegment;
+use Homeful\Mortgage\Data\MortgageData;
+use Homeful\Mortgage\Classes\CashOut;
+use Homeful\Mortgage\Classes\Amount;
 use Homeful\Common\Classes\Assert;
 use Homeful\Common\Classes\Input;
-use Homeful\Mortgage\Classes\Amount;
-use Homeful\Mortgage\Classes\CashOut;
-use Homeful\Mortgage\Data\MortgageData;
-use Homeful\Mortgage\Mortgage;
-use Homeful\Payment\Class\Term;
 use Homeful\Payment\Enums\Cycle;
-use Homeful\Payment\Payment;
+use Homeful\Payment\Class\Term;
+use Homeful\Borrower\Borrower;
+use Homeful\Mortgage\Mortgage;
 use Homeful\Property\Property;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
+use Brick\Math\RoundingMode;
+use Homeful\Payment\Payment;
 use Jarouche\Financial\PMT;
 use Jarouche\Financial\PV;
 use Whitecube\Price\Price;
+use Brick\Money\Money;
 
-it('accepts property and borrower and has configurable parameters', function () {
-    $borrower = (new Borrower)
-        ->setRegional(false)
-        ->setGrossMonthlyIncome(14500);
-    $property = (new Property)
-        ->setTotalContractPrice(new Price(Money::of(850000, 'PHP')))
-        ->setAppraisedValue(new Price(Money::of(850000, 'PHP')));
-    $params = [
-        Input::PERCENT_DP => 0 / 100,
-        Input::BP_INTEREST_RATE => 6.25 / 100,
-        Input::BP_TERM => 30,
-        Input::PERCENT_MF => 0 / 100,
-        Input::CONSULTING_FEE => 10000,
-    ];
-    $mortgage = new Mortgage(property: $property, borrower: $borrower, params: $params);
-
-    expect($mortgage->updateContractPrice()->base()->compareTo(850000))->toBe(Amount::EQUAL);
-    expect($mortgage->updateContractPrice()->inclusive()->compareTo(850000))->toBe(Amount::EQUAL);
-    expect($mortgage->getPercentDownPayment())->toBe(0.0);
-    expect($mortgage->getBalancepaymentTerm())->toBe(30);
-    expect($mortgage->getPercentMiscellaneousFees())->toBe(0 / 100);
-    expect($mortgage->getConsultingFee()->inclusive()->compareTo(10000))->toBe(Amount::EQUAL);
-
-    with($mortgage->getDownPayment(), function (Payment $dp) {
-        expect($dp->getPrincipal()->inclusive()->compareTo(0.0))->toBe(Amount::EQUAL);
-        expect($dp->getTerm()->value)->toBe(0);
-        expect($dp->getInterestRate())->toBe(0.0);
-    });
-
-    with($mortgage->getBalancePayment(), function (Payment $bp) use ($mortgage) {
-        expect($bp->getPrincipal()->compareTo($mortgage->updateContractPrice()))->toBe(Amount::EQUAL);
-        expect($bp->getTerm()->value)->toBe($mortgage->getBalancepaymentTerm());
-        expect($bp->getInterestRate())->toBe($mortgage->getInterestRate());
-        expect($bp->getMonthlyAmortization()->inclusive()->compareTo(5234.0))->toBe(Amount::EQUAL);
-    });
-
-    expect($mortgage->getConsultingFee()->inclusive()->compareTo(10000))->toBe(Amount::EQUAL);
-    expect($mortgage->getMiscellaneousFees()->inclusive()->compareTo(850000 * 0 / 100))->toBe(Amount::EQUAL);
-})->skip();
-
-it('has down payment', function () {
-    $borrower = (new Borrower)
-        ->setRegional(false)
-        ->setGrossMonthlyIncome(14500);
-    $property = (new Property)
-        ->setTotalContractPrice(new Price(Money::of($tcp = 850000, 'PHP')))
-        ->setAppraisedValue(new Price(Money::of(850000, 'PHP')));
-    $params = [
-        Input::PERCENT_DP => $percent_dp = 5 / 100,
-        Input::PERCENT_MF => $percent_mf = 8.5 / 100,
-        Input::DP_TERM => $dp_term = 12,
-    ];
-    $mortgage = new Mortgage(property: $property, borrower: $borrower, params: $params);
-    expect($mortgage->getPercentDownPayment())->toBe($percent_dp);
-    with($mortgage->getDownPayment(), function (Payment $dp) use ($tcp, $percent_dp, $percent_mf, $dp_term) {
-        expect($dp->getTerm()->value)->toBe($dp_term);
-        expect($dp->getTerm()->monthsToPay())->toBe($dp_term);
-        expect($dp->getTerm()->cycle)->toBe(Cycle::Monthly);
-        expect($dp->getInterestRate())->toBe(0.0);
-        expect($dp->getPrincipal()->base()->compareTo($tcp))->toBe(Amount::EQUAL);
-        expect($dp->getPrincipal()->inclusive()->compareTo($tcp * (1 + $percent_mf) * $percent_dp))->toBe(Amount::EQUAL);
-    });
-})->skip();
-
-it('has balance payment and amortization', function () {
-    $borrower = (new Borrower)
-        ->setRegional(false)
-        ->setGrossMonthlyIncome(14500);
-    $property = (new Property)
-        ->setTotalContractPrice(new Price(Money::of($tcp = 2500000, 'PHP')))
-        ->setAppraisedValue(new Price(Money::of(2500000, 'PHP')));
-    $params = [
-        Input::PERCENT_DP => $percent_dp = 5 / 100,
-        Input::PERCENT_MF => $percent_mf = 8.5 / 100,
-        Input::BP_TERM => $bp_term = 20,
-        Input::BP_INTEREST_RATE => $bp_interest = 7 / 100,
-    ];
-    $mortgage = new Mortgage(property: $property, borrower: $borrower, params: $params);
-    expect($mortgage->getPercentDownPayment())->toBe($percent_dp);
-    with($mortgage->getBalancePayment(), function (Payment $bp) use ($tcp, $percent_dp, $percent_mf, $bp_term, $bp_interest) {
-        expect($bp->getTerm()->value)->toBe($bp_term);
-        expect($bp->getTerm()->monthsToPay())->toBe($bp_term * 12);
-        expect($bp->getTerm()->cycle)->toBe(Cycle::Yearly);
-        expect($bp->getInterestRate())->toBe($bp_interest);
-        expect($bp->getPrincipal()->base()->compareTo($tcp * (1 - $percent_dp)))->toBe(Amount::EQUAL);
-        expect($bp->getPrincipal()->inclusive()->compareTo($tcp * (1 - $percent_dp) * (1 + $percent_mf)))->toBe(Amount::EQUAL);
-        expect($bp->getMonthlyAmortization()->inclusive()->compareTo(19978.0))->toBe(Amount::EQUAL);
-    });
-})->skip();
-
-it('has low cash out', function () {
-    $borrower = (new Borrower)
-        ->setRegional(false)
-        ->setGrossMonthlyIncome(14500);
-    $property = (new Property)
-        ->setTotalContractPrice(new Price(Money::of($tcp = 2500000, 'PHP')))
-        ->setAppraisedValue(new Price(Money::of(2500000, 'PHP')));
-    $params = [
-        Input::LOW_CASH_OUT => $low_cash_out = 30000,
-        Input::CONSULTING_FEE => $consulting_fee = 10000,
-    ];
-    $mortgage = new Mortgage(property: $property, borrower: $borrower, params: $params);
-    expect($mortgage->getLowCashOut()->inclusive()->compareTo($low_cash_out))->toBe(Amount::EQUAL);
-    expect($mortgage->getBalanceCashOut()->inclusive()->compareTo($low_cash_out - $consulting_fee))->toBe(Amount::EQUAL);
-    expect($mortgage->isPromotional())->toBeTrue();
-    $params = [
-        Input::LOW_CASH_OUT => $low_cash_out = 0,
-        Input::CONSULTING_FEE => 10000,
-    ];
-    $mortgage = new Mortgage(property: $property, borrower: $borrower, params: $params);
-    expect($mortgage->getLowCashOut()->inclusive()->compareTo($low_cash_out))->toBe(Amount::EQUAL);
-    expect($mortgage->getBalanceCashOut()->inclusive()->compareTo(0.0))->toBe(Amount::EQUAL);
-    expect($mortgage->isPromotional())->toBeFalse();
-})->skip();
-
-//it('has base and mf inclusive loan component', function () {
-//    $borrower = (new Borrower)
-//        ->setRegional(false)
-//        ->setGrossMonthlyIncome(14500);
-//    $property = (new Property)
-//        ->setTotalContractPrice(new Price(Money::of(850000, 'PHP')))
-//        ->setAppraisedValue(new Price(Money::of(850000, 'PHP')));
-//    $params = [
-//        Input::PERCENT_MF => 8.5/100,
-//        Input::PERCENT_DP => $percent_dp = 5/100,
-//        Input::CONSULTING_FEE => 10000,
-//        Input::LOW_CASH_OUT => 30000
-//    ];
-//    $percent_bp = 1 - $percent_dp;
-//    $mortgage = new Mortgage(property: $property, borrower: $borrower, params: $params);
-//    expect($mortgage->getMiscellaneousFees()->inclusive()->compareTo(72250.0))->toBe(Amount::EQUAL);
-//    expect($mortgage->getLoan()->base()->compareTo(850000))->toBe(Amount::EQUAL);
-//    $guess = $mortgage->isPromotional() ? (850000 * $percent_bp) + 72250.0 : (850000 + 72250.0) * $percent_bp;
-//    expect($mortgage->getLoan()->inclusive()->compareTo($guess))->toBe(Amount::EQUAL);
-//});
 
 dataset('agapeya-promo', function () {
     return [
@@ -176,35 +41,6 @@ dataset('agapeya-promo', function () {
     ];
 });
 
-it('has cash outs', function () {
-    $borrower = (new Borrower)
-        ->setRegional(false)
-        ->setGrossMonthlyIncome(14500);
-    $property = (new Property)
-        ->setTotalContractPrice(new Price(Money::of($tcp = 2500000, 'PHP')))
-        ->setAppraisedValue(new Price(Money::of(2500000, 'PHP')));
-    $params = [
-        Input::LOW_CASH_OUT => $low_cash_out = 30000,
-        Input::CONSULTING_FEE => $consulting_fee = 10000,
-    ];
-    $mortgage = new Mortgage(property: $property, borrower: $borrower, params: $params);
-    $mortgage->addCashOut(new CashOut('Processing Fee', 11000.0, true));
-    $mortgage->addCashOut($holding_fee = new CashOut('Holding Fee', 12000.0, true));
-    expect($mortgage->getCashOuts())->toBeInstanceOf(Collection::class);
-    with($mortgage->getCashOuts(), function (Collection $cash_outs) use ($holding_fee) {
-        expect($cash_outs)->toHaveCount(3);
-        with($cash_outs->first(), function (CashOut $cash_out) {
-            expect($cash_out->getName())->toBe(Input::CONSULTING_FEE);
-        });
-        expect($cash_outs->where(function (CashOut $cash_out) {
-            return $cash_out->getName() == 'Holding Fee';
-        })->first())->toBe($holding_fee);
-        expect($cash_outs->sum(function (CashOut $cash_out) {
-            return $cash_out->getAmount()->inclusive()->getAmount()->toFloat();
-        }))->toBe(10000.0 + 11000.0 + 12000.0);
-    });
-})->skip();
-
 dataset('sample-loan-computation', function () {
     return [
         //sample computation agapeya 70/50 duplex @ 20-year loan term
@@ -225,11 +61,11 @@ dataset('sample-loan-computation', function () {
             Assert::LOAN_AMOUNT => 2576875.0,
             Assert::LOAN_AMORTIZATION => 19978.0,
             Assert::PARTIAL_MISCELLANEOUS_FEES => 10625.0,
-            Assert::INCOME_REQUIREMENT_MULTIPLIER => 0.3,
-            Assert::JOINT_DISPOSABLE_MONTHLY_INCOME => 0.3 * 50000,
-            Assert::INCOME_REQUIREMENT => 66593.34,
-            Assert::MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME => Money::of(round((new PV((7 / 100) / 12, 20 * 12, 0.3 * 50000))->evaluate()), 'PHP', roundingMode: RoundingMode::CEILING)->getAmount()->toFloat(), //₱1,934,738.00
-            Assert::LOAN_DIFFERENCE => 2576875.0 - 1934738.0, //642137.0
+            Assert::INCOME_REQUIREMENT_MULTIPLIER => 0.35,
+            Assert::JOINT_DISPOSABLE_MONTHLY_INCOME => 0.35 * 50000,
+            Assert::INCOME_REQUIREMENT => 57080.0,
+            Assert::MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME => Money::of(round((new PV((7 / 100) / 12, 20 * 12, 0.35 * 50000))->evaluate()), 'PHP', roundingMode: RoundingMode::CEILING)->getAmount()->toFloat(), //₱2,257,194.00  ₱1,934,738.00
+            Assert::LOAN_DIFFERENCE => 2576875.0 - 2257194.0, //319681.0
 
             Assert::BALANCE_CASH_OUT => 0.0,
         ],
@@ -251,11 +87,11 @@ dataset('sample-loan-computation', function () {
             Assert::LOAN_AMOUNT => 2576875.0,
             Assert::LOAN_AMORTIZATION => 18213.0,
             Assert::PARTIAL_MISCELLANEOUS_FEES => 10625.0,
-            Assert::INCOME_REQUIREMENT_MULTIPLIER => 0.3,
-            Assert::JOINT_DISPOSABLE_MONTHLY_INCOME => 0.3 * 50000,
-            Assert::INCOME_REQUIREMENT => 60710.0,
-            Assert::MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME => Money::of(round((new PV((7 / 100) / 12, 25 * 12, 0.3 * 50000))->evaluate()), 'PHP', roundingMode: RoundingMode::CEILING)->getAmount()->toFloat(), //₱2,122,304.00
-            Assert::LOAN_DIFFERENCE => 2576875.0 - 2122304.0, //454571.0
+            Assert::INCOME_REQUIREMENT_MULTIPLIER => 0.35,
+            Assert::JOINT_DISPOSABLE_MONTHLY_INCOME => 0.35 * 50000,
+            Assert::INCOME_REQUIREMENT => 52037.15, //60710.0,
+            Assert::MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME => Money::of(round((new PV((7 / 100) / 12, 25 * 12, 0.35 * 50000))->evaluate()), 'PHP', roundingMode: RoundingMode::CEILING)->getAmount()->toFloat(), //₱2,476,021.00
+            Assert::LOAN_DIFFERENCE => 2576875.0 - 2476021.0, //100854.0
 
             Assert::BALANCE_CASH_OUT => 0.0,
         ],
@@ -277,11 +113,11 @@ dataset('sample-loan-computation', function () {
             Assert::LOAN_AMOUNT => 2576875.0,
             Assert::LOAN_AMORTIZATION => 17144.0,
             Assert::PARTIAL_MISCELLANEOUS_FEES => 10625.0,
-            Assert::INCOME_REQUIREMENT_MULTIPLIER => 0.3,
-            Assert::JOINT_DISPOSABLE_MONTHLY_INCOME => 0.3 * 50000,
-            Assert::INCOME_REQUIREMENT => 57146.67,
-            Assert::MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME => Money::of(round((new PV((7 / 100) / 12, 30 * 12, 0.3 * 50000))->evaluate()), 'PHP', roundingMode: RoundingMode::CEILING)->getAmount()->toFloat(), //₱2,254,614.00
-            Assert::LOAN_DIFFERENCE => 2576875.0 - 2254614.0, //322261.0
+            Assert::INCOME_REQUIREMENT_MULTIPLIER => 0.35,
+            Assert::JOINT_DISPOSABLE_MONTHLY_INCOME => 0.35 * 50000,
+            Assert::INCOME_REQUIREMENT => 48982.86,
+            Assert::MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME => Money::of(round((new PV((7 / 100) / 12, 30 * 12, 0.35 * 50000))->evaluate()), 'PHP', roundingMode: RoundingMode::CEILING)->getAmount()->toFloat(), //₱2,630,382.00
+            Assert::LOAN_DIFFERENCE => 2576875.0 - 2630382.0, //-53507.0
 
             Assert::BALANCE_CASH_OUT => 0.0,
         ],
@@ -377,7 +213,7 @@ it('has configurable miscellaneous fees', function () {
     $property = (new Property)
         ->setTotalContractPrice(new Price(Money::of($tcp = $params[Input::TCP], 'PHP')))
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
-
+    expect($property->getMarketSegment())->toBe(MarketSegment::ECONOMIC);
     with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($params) {
         expect($params[Input::TCP])->toBe($input_tcp = 2500000);
         expect($params[Input::PERCENT_MF])->toBe($input_percent_mf = 8.5 / 100);
@@ -408,6 +244,7 @@ it('has configurable down payment', function () {
     $property = (new Property)
         ->setTotalContractPrice(new Price(Money::of($tcp = $params[Input::TCP], 'PHP')))
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
+    expect($property->getMarketSegment())->toBe(MarketSegment::ECONOMIC);
     with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($params) {
         expect($params[Input::TCP])->toBe($input_tcp = 2500000);
         expect($params[Input::DP_TERM])->toBe($input_dp_term = 24);
@@ -460,7 +297,7 @@ it('has configurable contract price', function () {
     $property = (new Property)
         ->setTotalContractPrice(new Price(Money::of($tcp = $params[Input::TCP], 'PHP')))
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
-
+    expect($property->getMarketSegment())->toBe(MarketSegment::ECONOMIC);
     with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($property, $params) {
         //confirm inputs
         expect($params[Input::TCP])->toBe($input_tcp = 2500000);
@@ -511,7 +348,7 @@ it('has configurable contract price', function () {
         expect($guess_loan_amortization)->toBe(19978.0);
         expect($mortgage->getLoan()->getMonthlyAmortization()->inclusive()->compareTo($guess_loan_amortization))->toBe(Amount::EQUAL);
         $guess_income_requirement = Money::of($guess_loan_amortization / $property->getDefaultDisposableIncomeRequirementMultiplier(), 'PHP', roundingMode: RoundingMode::CEILING);
-        expect($guess_income_requirement->compareTo(66593.34))->toBe(Amount::EQUAL);
+        expect($guess_income_requirement->compareTo(57080.0))->toBe(Amount::EQUAL);
         expect($mortgage->getLoan()->getIncomeRequirement()->compareTo($guess_income_requirement))->toBe(Amount::EQUAL);
 
         //loan @ 25-year term
@@ -523,7 +360,7 @@ it('has configurable contract price', function () {
         expect($guess_loan_amortization)->toBe(18213.0);
         expect($mortgage->getLoan()->getMonthlyAmortization()->inclusive()->compareTo($guess_loan_amortization))->toBe(Amount::EQUAL);
         $guess_income_requirement = Money::of($guess_loan_amortization / $property->getDefaultDisposableIncomeRequirementMultiplier(), 'PHP', roundingMode: RoundingMode::CEILING);
-        expect($guess_income_requirement->compareTo(60710.0))->toBe(Amount::EQUAL);
+        expect($guess_income_requirement->compareTo(52037.15))->toBe(Amount::EQUAL);
         expect($mortgage->getLoan()->getIncomeRequirement()->compareTo($guess_income_requirement))->toBe(Amount::EQUAL);
 
         //loan @ 30-year term
@@ -535,11 +372,11 @@ it('has configurable contract price', function () {
         expect($guess_loan_amortization)->toBe(17144.0);
         expect($mortgage->getLoan()->getMonthlyAmortization()->inclusive()->compareTo($guess_loan_amortization))->toBe(Amount::EQUAL);
         $guess_income_requirement = Money::of($guess_loan_amortization / $property->getDefaultDisposableIncomeRequirementMultiplier(), 'PHP', roundingMode: RoundingMode::CEILING);
-        expect($guess_income_requirement->compareTo(57146.67))->toBe(Amount::EQUAL);
+        expect($guess_income_requirement->compareTo(48982.86))->toBe(Amount::EQUAL);
         expect($mortgage->getLoan()->getIncomeRequirement()->compareTo($guess_income_requirement))->toBe(Amount::EQUAL);
 
         //change contract price
-        $mortgage->setContractPrice($new_tcp = 4500000.0);
+        $mortgage->setContractPrice($new_tcp = 4500000.0);//TODO: make sure the market segment is synchronized in the future
 
         //confirm properties from inputs
         expect($mortgage->getContractPrice()->inclusive()->compareTo($new_tcp))->toBe(Amount::EQUAL);
@@ -583,7 +420,7 @@ it('has configurable contract price', function () {
         expect($guess_loan_amortization)->toBe(35961.0);
         expect($mortgage->getLoan()->getMonthlyAmortization()->inclusive()->compareTo($guess_loan_amortization))->toBe(Amount::EQUAL);
         $guess_income_requirement = Money::of($guess_loan_amortization / $property->getDefaultDisposableIncomeRequirementMultiplier(), 'PHP', roundingMode: RoundingMode::CEILING);
-        expect($guess_income_requirement->compareTo(119870.0))->toBe(Amount::EQUAL);
+        expect($guess_income_requirement->compareTo(102745.72))->toBe(Amount::EQUAL);
         expect($mortgage->getLoan()->getIncomeRequirement()->compareTo($guess_income_requirement))->toBe(Amount::EQUAL);
 
         //loan @ 25-year term
@@ -595,7 +432,7 @@ it('has configurable contract price', function () {
         expect($guess_loan_amortization)->toBe(32783.0);
         expect($mortgage->getLoan()->getMonthlyAmortization()->inclusive()->compareTo($guess_loan_amortization))->toBe(Amount::EQUAL);
         $guess_income_requirement = Money::of($guess_loan_amortization / $property->getDefaultDisposableIncomeRequirementMultiplier(), 'PHP', roundingMode: RoundingMode::CEILING);
-        expect($guess_income_requirement->compareTo(109276.67))->toBe(Amount::EQUAL);
+        expect($guess_income_requirement->compareTo(93665.72))->toBe(Amount::EQUAL);
         expect($mortgage->getLoan()->getIncomeRequirement()->compareTo($guess_income_requirement))->toBe(Amount::EQUAL);
 
         //loan @ 30-year term
@@ -607,7 +444,7 @@ it('has configurable contract price', function () {
         expect($guess_loan_amortization)->toBe(30859.0);
         expect($mortgage->getLoan()->getMonthlyAmortization()->inclusive()->compareTo($guess_loan_amortization))->toBe(Amount::EQUAL);
         $guess_income_requirement = Money::of($guess_loan_amortization / $property->getDefaultDisposableIncomeRequirementMultiplier(), 'PHP', roundingMode: RoundingMode::CEILING);
-        expect($guess_income_requirement->compareTo(102863.34))->toBe(Amount::EQUAL);
+        expect($guess_income_requirement->compareTo(88168.58))->toBe(Amount::EQUAL);
         expect($mortgage->getLoan()->getIncomeRequirement()->compareTo($guess_income_requirement))->toBe(Amount::EQUAL);
     });
 });
@@ -619,7 +456,6 @@ it('computes different loan packages', function (array $params) {
     $property = (new Property)
         ->setTotalContractPrice(new Price(Money::of($tcp = $params[Input::TCP], 'PHP')))
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
-
     with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($params) {
         expect($mortgage->getContractPrice()->inclusive()->compareTo($params[Input::TCP]))->toBe(Amount::EQUAL);
         expect($mortgage->getMiscellaneousFees()->inclusive()->compareTo($params[Assert::MISCELLANEOUS_FEES]))->toBe(Amount::EQUAL);
