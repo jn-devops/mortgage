@@ -21,6 +21,7 @@ use Homeful\Payment\Class\Term;
 use Homeful\Property\Property;
 use Illuminate\Support\Carbon;
 use Homeful\Borrower\Borrower;
+use \Brick\Math\RoundingMode;
 use Homeful\Payment\Payment;
 use Illuminate\Support\Arr;
 use Whitecube\Price\Price;
@@ -225,13 +226,12 @@ final class Mortgage
         $disposable_income_requirement = (new Payment)
             ->setPrincipal($tcp)->setTerm(self::getDefaultLoanTerm())->setInterestRate(self::getDefaultInterestRate())
             ->getMonthlyAmortization()->addModifier('gmi', function ($modifier) use ($property) {
-                $modifier->divide($property->getDisposableIncomeRequirementMultiplier());
+                $modifier->divide($property->getDisposableIncomeRequirementMultiplier(), RoundingMode::CEILING);
             })->inclusive();
 
         $disposable_income_requirement = $disposable_income_requirement instanceof Money ? $disposable_income_requirement : null;
         $birthdate_from_default_age = Carbon::now()->addYears(-1 * self::getDefaultAge());
         $borrower = (new Borrower)->setGrossMonthlyIncome($disposable_income_requirement)->setBirthdate($birthdate_from_default_age);
-
         return new self($property, $borrower, $params);
     }
 }
