@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.04 - 2024-09-17
+
+add RoundingMode::CEILING to createWithTypicalBorrower'
+
 ## #v1.0.3 - 2024-09-08
 
 add property to config
