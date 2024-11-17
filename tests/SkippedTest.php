@@ -1,23 +1,23 @@
 <?php
 
-use Brick\Math\RoundingMode;
-use Brick\Money\Money;
-use Homeful\Borrower\Borrower;
+use Homeful\Mortgage\Data\MortgageData;
+use Homeful\Mortgage\Classes\CashOut;
+use Homeful\Mortgage\Classes\Amount;
+use Illuminate\Support\Collection;
 use Homeful\Common\Classes\Assert;
 use Homeful\Common\Classes\Input;
-use Homeful\Mortgage\Classes\Amount;
-use Homeful\Mortgage\Classes\CashOut;
-use Homeful\Mortgage\Data\MortgageData;
-use Homeful\Mortgage\Mortgage;
-use Homeful\Payment\Class\Term;
 use Homeful\Payment\Enums\Cycle;
-use Homeful\Payment\Payment;
+use Homeful\Payment\Class\Term;
+use Homeful\Mortgage\Mortgage;
+use Homeful\Borrower\Borrower;
 use Homeful\Property\Property;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
+use Brick\Math\RoundingMode;
+use Homeful\Payment\Payment;
 use Jarouche\Financial\PMT;
 use Jarouche\Financial\PV;
 use Whitecube\Price\Price;
+use Brick\Money\Money;
 
 it('accepts property and borrower and has configurable parameters', function () {
     $borrower = (new Borrower)
@@ -183,3 +183,24 @@ it('has cash outs', function () {
         }))->toBe(10000.0 + 11000.0 + 12000.0);
     });
 })->skip();
+
+dataset('agapeya-promo', function () {
+    return [
+        //sample computation agapeya 70/50 duplex
+        fn () => ['total_contract_price' => 2500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 8.5 / 100, Input::LOW_CASH_OUT => 0.0, Input::BP_TERM => 20, 'guess_loan_amount' => 2576875.0, 'guess_balance_cash_out_amount' => 0.0, 'guess_loan_amortization_amount' => 19978.0, 'guess_down_payment_amount' => 135625.0, 'guess_dp_amortization_amount' => 9583.34],
+        fn () => ['total_contract_price' => 2500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 8.5 / 100, Input::LOW_CASH_OUT => 0.0, Input::BP_TERM => 25, 'guess_loan_amount' => 2576875.0, 'guess_balance_cash_out_amount' => 0.0, 'guess_loan_amortization_amount' => 18213.0, 'guess_down_payment_amount' => 135625.0, 'guess_dp_amortization_amount' => 9583.34],
+        fn () => ['total_contract_price' => 2500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 8.5 / 100, Input::LOW_CASH_OUT => 0.0, Input::BP_TERM => 30, 'guess_loan_amount' => 2576875.0, 'guess_balance_cash_out_amount' => 0.0, 'guess_loan_amortization_amount' => 17144.0, 'guess_down_payment_amount' => 135625.0, 'guess_dp_amortization_amount' => 9583.34],
+        //        //sample computation ter-je 2br 40 sqm
+        fn () => ['total_contract_price' => 4500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 8.5 / 100, Input::LOW_CASH_OUT => 0.0, Input::BP_TERM => 20, 'guess_loan_amount' => 4638375.0, 'guess_balance_cash_out_amount' => 0.0, 'guess_loan_amortization_amount' => 35961.0, 'guess_down_payment_amount' => 244125.0, 'guess_dp_amortization_amount' => 17916.67],
+        fn () => ['total_contract_price' => 4500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 8.5 / 100, Input::LOW_CASH_OUT => 0.0, Input::BP_TERM => 25, 'guess_loan_amount' => 4638375.0, 'guess_balance_cash_out_amount' => 0.0, 'guess_loan_amortization_amount' => 32783.0, 'guess_down_payment_amount' => 244125.0, 'guess_dp_amortization_amount' => 17916.67],
+        fn () => ['total_contract_price' => 4500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 8.5 / 100, Input::LOW_CASH_OUT => 0.0, Input::BP_TERM => 30, 'guess_loan_amount' => 4638375.0, 'guess_balance_cash_out_amount' => 0.0, 'guess_loan_amortization_amount' => 30859.0, 'guess_down_payment_amount' => 244125.0, 'guess_dp_amortization_amount' => 17916.67],
+        //        //sample computation agapeya 70/50 duplex (low cash out)
+        fn () => ['total_contract_price' => 2500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 5 / 100, Input::LOW_CASH_OUT => 30000, Input::BP_TERM => 20, 'guess_loan_amount' => 2500000.0, 'guess_balance_cash_out_amount' => 20000, 'guess_loan_amortization_amount' => 19382.0, 'guess_down_payment_amount' => 0.0, 'guess_dp_amortization_amount' => 0.0],
+        fn () => ['total_contract_price' => 2500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 5 / 100, Input::LOW_CASH_OUT => 30000, Input::BP_TERM => 25, 'guess_loan_amount' => 2500000.0, 'guess_balance_cash_out_amount' => 20000, 'guess_loan_amortization_amount' => 17669.0, 'guess_down_payment_amount' => 0.0, 'guess_dp_amortization_amount' => 0.0],
+        fn () => ['total_contract_price' => 2500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 5 / 100, Input::LOW_CASH_OUT => 30000, Input::BP_TERM => 30, 'guess_loan_amount' => 2500000.0, 'guess_balance_cash_out_amount' => 20000, 'guess_loan_amortization_amount' => 16633.0, 'guess_down_payment_amount' => 0.0, 'guess_dp_amortization_amount' => 0.0],
+        //        //sample computation ter-je 2br 40 sqm (low cash out)
+        fn () => ['total_contract_price' => 4500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 5 / 100, Input::LOW_CASH_OUT => 50000, Input::BP_TERM => 20, 'guess_loan_amount' => 4500000.0, 'guess_balance_cash_out_amount' => 40000, 'guess_loan_amortization_amount' => 34888.0, 'guess_down_payment_amount' => 0.0, 'guess_dp_amortization_amount' => 0.0],
+        fn () => ['total_contract_price' => 4500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 5 / 100, Input::LOW_CASH_OUT => 50000, Input::BP_TERM => 25, 'guess_loan_amount' => 4500000.0, 'guess_balance_cash_out_amount' => 40000, 'guess_loan_amortization_amount' => 31805.0, 'guess_down_payment_amount' => 0.0, 'guess_dp_amortization_amount' => 0.0],
+        fn () => ['total_contract_price' => 4500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 5 / 100, Input::LOW_CASH_OUT => 50000, Input::BP_TERM => 30, 'guess_loan_amount' => 4500000.0, 'guess_balance_cash_out_amount' => 40000, 'guess_loan_amortization_amount' => 29939.0, 'guess_down_payment_amount' => 0.0, 'guess_dp_amortization_amount' => 0.0],
+    ];
+});

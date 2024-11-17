@@ -19,25 +19,9 @@ use Jarouche\Financial\PV;
 use Whitecube\Price\Price;
 use Brick\Money\Money;
 
-
-dataset('agapeya-promo', function () {
+dataset('property', function () {
     return [
-        //sample computation agapeya 70/50 duplex
-        fn () => ['total_contract_price' => 2500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 8.5 / 100, Input::LOW_CASH_OUT => 0.0, Input::BP_TERM => 20, 'guess_loan_amount' => 2576875.0, 'guess_balance_cash_out_amount' => 0.0, 'guess_loan_amortization_amount' => 19978.0, 'guess_down_payment_amount' => 135625.0, 'guess_dp_amortization_amount' => 9583.34],
-        fn () => ['total_contract_price' => 2500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 8.5 / 100, Input::LOW_CASH_OUT => 0.0, Input::BP_TERM => 25, 'guess_loan_amount' => 2576875.0, 'guess_balance_cash_out_amount' => 0.0, 'guess_loan_amortization_amount' => 18213.0, 'guess_down_payment_amount' => 135625.0, 'guess_dp_amortization_amount' => 9583.34],
-        fn () => ['total_contract_price' => 2500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 8.5 / 100, Input::LOW_CASH_OUT => 0.0, Input::BP_TERM => 30, 'guess_loan_amount' => 2576875.0, 'guess_balance_cash_out_amount' => 0.0, 'guess_loan_amortization_amount' => 17144.0, 'guess_down_payment_amount' => 135625.0, 'guess_dp_amortization_amount' => 9583.34],
-        //        //sample computation ter-je 2br 40 sqm
-        fn () => ['total_contract_price' => 4500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 8.5 / 100, Input::LOW_CASH_OUT => 0.0, Input::BP_TERM => 20, 'guess_loan_amount' => 4638375.0, 'guess_balance_cash_out_amount' => 0.0, 'guess_loan_amortization_amount' => 35961.0, 'guess_down_payment_amount' => 244125.0, 'guess_dp_amortization_amount' => 17916.67],
-        fn () => ['total_contract_price' => 4500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 8.5 / 100, Input::LOW_CASH_OUT => 0.0, Input::BP_TERM => 25, 'guess_loan_amount' => 4638375.0, 'guess_balance_cash_out_amount' => 0.0, 'guess_loan_amortization_amount' => 32783.0, 'guess_down_payment_amount' => 244125.0, 'guess_dp_amortization_amount' => 17916.67],
-        fn () => ['total_contract_price' => 4500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 8.5 / 100, Input::LOW_CASH_OUT => 0.0, Input::BP_TERM => 30, 'guess_loan_amount' => 4638375.0, 'guess_balance_cash_out_amount' => 0.0, 'guess_loan_amortization_amount' => 30859.0, 'guess_down_payment_amount' => 244125.0, 'guess_dp_amortization_amount' => 17916.67],
-        //        //sample computation agapeya 70/50 duplex (low cash out)
-        fn () => ['total_contract_price' => 2500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 5 / 100, Input::LOW_CASH_OUT => 30000, Input::BP_TERM => 20, 'guess_loan_amount' => 2500000.0, 'guess_balance_cash_out_amount' => 20000, 'guess_loan_amortization_amount' => 19382.0, 'guess_down_payment_amount' => 0.0, 'guess_dp_amortization_amount' => 0.0],
-        fn () => ['total_contract_price' => 2500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 5 / 100, Input::LOW_CASH_OUT => 30000, Input::BP_TERM => 25, 'guess_loan_amount' => 2500000.0, 'guess_balance_cash_out_amount' => 20000, 'guess_loan_amortization_amount' => 17669.0, 'guess_down_payment_amount' => 0.0, 'guess_dp_amortization_amount' => 0.0],
-        fn () => ['total_contract_price' => 2500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 5 / 100, Input::LOW_CASH_OUT => 30000, Input::BP_TERM => 30, 'guess_loan_amount' => 2500000.0, 'guess_balance_cash_out_amount' => 20000, 'guess_loan_amortization_amount' => 16633.0, 'guess_down_payment_amount' => 0.0, 'guess_dp_amortization_amount' => 0.0],
-        //        //sample computation ter-je 2br 40 sqm (low cash out)
-        fn () => ['total_contract_price' => 4500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 5 / 100, Input::LOW_CASH_OUT => 50000, Input::BP_TERM => 20, 'guess_loan_amount' => 4500000.0, 'guess_balance_cash_out_amount' => 40000, 'guess_loan_amortization_amount' => 34888.0, 'guess_down_payment_amount' => 0.0, 'guess_dp_amortization_amount' => 0.0],
-        fn () => ['total_contract_price' => 4500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 5 / 100, Input::LOW_CASH_OUT => 50000, Input::BP_TERM => 25, 'guess_loan_amount' => 4500000.0, 'guess_balance_cash_out_amount' => 40000, 'guess_loan_amortization_amount' => 31805.0, 'guess_down_payment_amount' => 0.0, 'guess_dp_amortization_amount' => 0.0],
-        fn () => ['total_contract_price' => 4500000, Input::CONSULTING_FEE => 10000, Input::PERCENT_DP => 5 / 100, Input::DP_TERM => 12, Input::BP_INTEREST_RATE => 7 / 100, Input::PERCENT_MF => 5 / 100, Input::LOW_CASH_OUT => 50000, Input::BP_TERM => 30, 'guess_loan_amount' => 4500000.0, 'guess_balance_cash_out_amount' => 40000, 'guess_loan_amortization_amount' => 29939.0, 'guess_down_payment_amount' => 0.0, 'guess_dp_amortization_amount' => 0.0],
+        [fn () => (new Property)->setTotalContractPrice(Price::of(849999, 'PHP'))->setDisposableIncomeRequirementMultiplier($this->multiplier)],
     ];
 });
 
@@ -199,6 +183,32 @@ dataset('sample-loan-computation', function () {
 
             Assert::BALANCE_CASH_OUT => 0.0,
         ],
+        //sample computation for housing
+        fn () => [
+            Input::WAGES => 20000,
+            Input::TCP => 750000,
+            Input::PERCENT_DP => 2 / 100,
+            Input::DP_TERM => 3,
+            Input::BP_INTEREST_RATE => 7 / 100,
+            Input::PERCENT_MF => 0 / 100,
+            Input::LOW_CASH_OUT => 0.0,
+            Input::BP_TERM => 30,
+
+            Assert::MISCELLANEOUS_FEES => 750000 * 0,
+            Assert::DOWN_PAYMENT => 750000 * 2 / 100,//15,000
+            Assert::CASH_OUT => 750000 * 2 / 100 + 0.0,
+            Assert::DOWN_PAYMENT_AMORTIZATION => 5000.0,
+            Assert::LOAN_AMOUNT => 735000.0,
+            Assert::LOAN_AMORTIZATION => 4890.0,
+            Assert::PARTIAL_MISCELLANEOUS_FEES => 0.0,
+            Assert::INCOME_REQUIREMENT_MULTIPLIER => 0.35,
+            Assert::JOINT_DISPOSABLE_MONTHLY_INCOME => 0.35 * 20000,
+            Assert::INCOME_REQUIREMENT => 13971.43,
+            Assert::MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME => Money::of(round((new PV((7 / 100) / 12, 30 * 12, 0.35 * 20000))->evaluate()), 'PHP', roundingMode: RoundingMode::CEILING)->getAmount()->toFloat(), //₱2,254,614.00
+            Assert::LOAN_DIFFERENCE => 735000.0 - 1052153.0, //-317153.0
+
+            Assert::BALANCE_CASH_OUT => 0.0,
+        ],
     ];
 });
 
@@ -207,13 +217,13 @@ it('has configurable miscellaneous fees', function () {
         Input::TCP => 2500000,
         Input::PERCENT_MF => 8.5 / 100,
     ];
-    $borrower = (new Borrower)
-        ->setRegional(false)
-        ->setGrossMonthlyIncome(50000);
     $property = (new Property)
         ->setTotalContractPrice(new Price(Money::of($tcp = $params[Input::TCP], 'PHP')))
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
-    expect($property->getMarketSegment())->toBe(MarketSegment::ECONOMIC);
+    $borrower = (new Borrower($property))
+        ->setRegional(false)
+        ->setGrossMonthlyIncome(50000);
+    expect($borrower->getProperty()->getMarketSegment())->toBe(MarketSegment::ECONOMIC);
     with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($params) {
         expect($params[Input::TCP])->toBe($input_tcp = 2500000);
         expect($params[Input::PERCENT_MF])->toBe($input_percent_mf = 8.5 / 100);
@@ -238,13 +248,13 @@ it('has configurable down payment', function () {
         Input::DP_TERM => 24,
         Input::PERCENT_DP => 5 / 100,
     ];
-    $borrower = (new Borrower)
-        ->setRegional(false)
-        ->setGrossMonthlyIncome(50000);
     $property = (new Property)
         ->setTotalContractPrice(new Price(Money::of($tcp = $params[Input::TCP], 'PHP')))
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
-    expect($property->getMarketSegment())->toBe(MarketSegment::ECONOMIC);
+    $borrower = (new Borrower($property))
+        ->setRegional(false)
+        ->setGrossMonthlyIncome(50000);
+    expect($borrower->getProperty()->getMarketSegment())->toBe(MarketSegment::ECONOMIC);
     with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($params) {
         expect($params[Input::TCP])->toBe($input_tcp = 2500000);
         expect($params[Input::DP_TERM])->toBe($input_dp_term = 24);
@@ -291,12 +301,12 @@ it('has configurable contract price', function () {
         Input::BP_TERM => 20,
         Input::BP_INTEREST_RATE => 7 / 100,
     ];
-    $borrower = (new Borrower)
-        ->setRegional(false)
-        ->setGrossMonthlyIncome(50000);
     $property = (new Property)
         ->setTotalContractPrice(new Price(Money::of($tcp = $params[Input::TCP], 'PHP')))
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
+    $borrower = (new Borrower($property))
+        ->setRegional(false)
+        ->setGrossMonthlyIncome(50000);
     expect($property->getMarketSegment())->toBe(MarketSegment::ECONOMIC);
     with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($property, $params) {
         //confirm inputs
@@ -450,12 +460,12 @@ it('has configurable contract price', function () {
 });
 
 it('computes different loan packages', function (array $params) {
-    $borrower = (new Borrower)
-        ->setRegional(false)
-        ->setGrossMonthlyIncome($params[Input::WAGES]);
     $property = (new Property)
         ->setTotalContractPrice(new Price(Money::of($tcp = $params[Input::TCP], 'PHP')))
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
+    $borrower = (new Borrower($property))
+        ->setRegional(false)
+        ->setGrossMonthlyIncome($params[Input::WAGES]);
     with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($params) {
         expect($mortgage->getContractPrice()->inclusive()->compareTo($params[Input::TCP]))->toBe(Amount::EQUAL);
         expect($mortgage->getMiscellaneousFees()->inclusive()->compareTo($params[Assert::MISCELLANEOUS_FEES]))->toBe(Amount::EQUAL);
@@ -481,9 +491,6 @@ it('can simulate loan calculator', function () {
     $property = (new Property)
         ->setTotalContractPrice(new Price(Money::of($tcp = 4500000, 'PHP')))
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
-    $borrower = (new Borrower)
-        ->setRegional(false)
-        ->setGrossMonthlyIncome(50000);
     $params = [
         Input::WAGES => 110000,
         Input::TCP => 4500000,
@@ -632,13 +639,13 @@ it('can simulate loan calculator', function () {
 });
 
 it('has mortgage data', function (array $params) {
-    $borrower = (new Borrower)
-        ->setRegional(false)
-        ->setAge(25)
-        ->setGrossMonthlyIncome($params[Input::WAGES]);
     $property = (new Property)
         ->setTotalContractPrice(new Price(Money::of($tcp = $params[Input::TCP], 'PHP')))
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
+    $borrower = (new Borrower($property))
+        ->setRegional(false)
+        ->setAge(25)
+        ->setGrossMonthlyIncome($params[Input::WAGES]);
     with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($params) {
         $data = MortgageData::fromObject($mortgage);
         expect($data->borrower->gross_monthly_income)->toBe((float) $params[Input::WAGES]);

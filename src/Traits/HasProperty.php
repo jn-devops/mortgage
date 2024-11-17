@@ -22,14 +22,26 @@ trait HasProperty
     {
         $this->property = $property;
 
-        return $this->updateContractPrice();
+        return $this->updateBorrowerProperty()->updateContractPrice();
     }
 
     /**
      * @return Mortgage|HasProperty
+     * @throws \Brick\Math\Exception\NumberFormatException
+     * @throws \Brick\Math\Exception\RoundingNecessaryException
+     * @throws \Brick\Money\Exception\UnknownCurrencyException
      */
     public function updateContractPrice(): self
     {
         return $this->setContractPrice($this->property->getTotalContractPrice());
+    }
+
+    protected function updateBorrowerProperty(): self
+    {
+        if (isset($this->borrower)) {
+            $this->getBorrower()->setProperty($this->getProperty());
+        }
+
+        return $this;
     }
 }

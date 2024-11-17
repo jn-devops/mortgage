@@ -65,7 +65,7 @@ final class Mortgage
      */
     public function __construct(Property $property, Borrower $borrower, array $params)
     {
-        $this->initCashOuts()->setProperty($property)->setBorrower($borrower);
+        $this->initCashOuts()->setBorrower($borrower)->setProperty($property);
 
         $validated = Validator::validate($params, [
             Input::PERCENT_DP => ['nullable', 'numeric', 'min:0', 'max:1'],
