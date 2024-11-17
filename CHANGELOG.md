@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.0.5 - 2024-11-17
+
+include Housing Loan test values
+
 ## #v1.04 - 2024-09-17
 
 add RoundingMode::CEILING to createWithTypicalBorrower'
