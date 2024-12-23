@@ -77,6 +77,12 @@ final class Mortgage
             Input::LOW_CASH_OUT => ['nullable', 'numeric', 'min:0.0', 'max:100000.0'],
         ]);
 
+        $interest = Arr::get($validated,Input::BP_INTEREST_RATE);
+        if ($interest == null) {
+            $interest = $property->getDefaultAnnualInterestRateFromBorrower($borrower);
+            Arr::set($validated, Input::BP_INTEREST_RATE, $interest);
+        }
+
         $this->update($validated);
     }
 
