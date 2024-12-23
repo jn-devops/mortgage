@@ -210,7 +210,7 @@ dataset('sample-loan-computation', function () {
             Assert::BALANCE_CASH_OUT => 0.0,
         ],
 
-        //sample computation agapeya 70/50 duplex @ 30-year loan term with default interest rate
+        //sample computation agapeya 70/50 duplex @ 30-year loan term with default interest rate and default bp term
         fn () => [
             Input::WAGES => 60000,
             Input::TCP => 2707500.0,
@@ -219,7 +219,7 @@ dataset('sample-loan-computation', function () {
 //            Input::BP_INTEREST_RATE => 7 / 100,
             Input::PERCENT_MF => 5 / 100,
             Input::LOW_CASH_OUT => 0.0,
-            Input::BP_TERM => 30,
+//            Input::BP_TERM => 30,
 
             Assert::MISCELLANEOUS_FEES => 135375, // 0.05 * 2,707,500.0
             Assert::DOWN_PAYMENT => 135375, // 0.05 * 2,707,500.0
@@ -491,6 +491,7 @@ it('computes different loan packages', function (array $params) {
         ->setTotalContractPrice(new Price(Money::of($tcp = $params[Input::TCP], 'PHP')))
         ->setAppraisedValue(new Price(Money::of($tcp, 'PHP')));
     $borrower = (new Borrower($property))
+        ->setBirthdate(Carbon::parse('1999-03-17'))
         ->setRegional(false)
         ->setGrossMonthlyIncome($params[Input::WAGES]);
     with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($params) {
@@ -694,4 +695,4 @@ it('has mortgage data', function (array $params) {
         expect($data->present_value_from_monthly_disposable_income)->toBe($params[Assert::MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME]);
         expect($data->loan_difference)->toBe((float) $params[Assert::LOAN_DIFFERENCE]);
     });
-})->with('sample-loan-computation')->skip();
+})->with('sample-loan-computation');

@@ -26,6 +26,7 @@ use Homeful\Payment\Payment;
 use Illuminate\Support\Arr;
 use Whitecube\Price\Price;
 use Brick\Money\Money;
+use Homeful\Borrower\Exceptions\BirthdateNotSet;
 
 /**
  * Class Mortgage
@@ -81,6 +82,14 @@ final class Mortgage
         if ($interest == null) {
             $interest = $property->getDefaultAnnualInterestRateFromBorrower($borrower);
             Arr::set($validated, Input::BP_INTEREST_RATE, $interest);
+        }
+        $term = Arr::get($validated,Input::BP_TERM);
+        if ($term == null) {
+            try {
+                $term = $borrower->getMaximumTermAllowed();
+                Arr::set($validated, Input::BP_TERM, $term);
+            }
+            catch (BirthdateNotSet $exception) {}
         }
 
         $this->update($validated);
