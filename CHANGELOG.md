@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.0.8 - 2024-12-24
+
+inject percent dp, dp term, percent mf from property interface if inputs are null'
+
 ## #v1.0.7 - 2024-12-23
 
 inject maximum term allowed from buyer if input bp term is null
