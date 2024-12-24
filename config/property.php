@@ -28,4 +28,10 @@ return [
             'socialized' => env('SOCIALIZED_MARKET_LOANABLE_MULTIPLIER', 1.00),
         ],
     ],
+    'default' => [
+        'processing_fee' => env('PROCESSING_FEE', 10000),
+        'percent_dp' => env('PERCENT_DP', 5/100),
+        'dp_term' => env('DP_TERM', 6), //months
+        'percent_mf' => env('PERCENT_MF', 5/100),
+    ],
 ];

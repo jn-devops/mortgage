@@ -214,10 +214,10 @@ dataset('sample-loan-computation', function () {
         fn () => [
             Input::WAGES => 60000,
             Input::TCP => 2707500.0,
-            Input::PERCENT_DP => 5 / 100,
-            Input::DP_TERM => 6,
+//            Input::PERCENT_DP => 5 / 100, //set dp in config
+//            Input::DP_TERM => 6, //set dp in config
 //            Input::BP_INTEREST_RATE => 7 / 100,
-            Input::PERCENT_MF => 5 / 100,
+//            Input::PERCENT_MF => 5 / 100, //set dp in config
             Input::LOW_CASH_OUT => 0.0,
 //            Input::BP_TERM => 30,
 
@@ -678,14 +678,14 @@ it('has mortgage data', function (array $params) {
         $data = MortgageData::fromObject($mortgage);
         expect($data->borrower->gross_monthly_income)->toBe((float) $params[Input::WAGES]);
         expect($data->property->total_contract_price)->toBe((float) $params[Input::TCP]);
-        expect($data->percent_down_payment)->toBe($params[Input::PERCENT_DP]);
+        expect($data->percent_down_payment)->toBe($mortgage->getPercentDownPayment());
         expect($data->dp_term)->toBe((float) $mortgage->getDownPaymentTerm());
         expect($data->bp_interest_rate)->toBe($mortgage->getInterestRate());
         expect($data->bp_term)->toBe((float) $mortgage->getBalancePaymentTerm());
         expect($data->miscellaneous_fees)->toBe((float) $params[Assert::MISCELLANEOUS_FEES]);
-        expect($data->down_payment)->toBe((float) $params[Assert::DOWN_PAYMENT]);
+        expect($data->down_payment)->toBe((float) $mortgage->getDownPayment()->getPrincipal()->inclusive()->getAmount()->toFloat());
         expect($data->cash_out)->toBe((float) $params[Assert::CASH_OUT]);
-        expect($data->dp_amortization)->toBe((float) $params[Assert::DOWN_PAYMENT_AMORTIZATION]);
+        expect($data->dp_amortization)->toBe((float) $mortgage->getDownPayment()->getMonthlyAmortization()->inclusive()->getAmount()->toFloat());
         expect($data->loan_amount)->toBe((float) $params[Assert::LOAN_AMOUNT]);
         expect($data->loan_amortization)->toBe((float) $params[Assert::LOAN_AMORTIZATION]);
         expect($data->partial_miscellaneous_fees)->toBe((float) $params[Assert::PARTIAL_MISCELLANEOUS_FEES]);
