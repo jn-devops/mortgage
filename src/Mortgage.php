@@ -3,10 +3,12 @@
 namespace Homeful\Mortgage;
 
 use Homeful\Mortgage\Actions\CalculateLoanDifference;
+use Homeful\Mortgage\Classes\AddOnFeeToLoanAmortization;
 use Homeful\Mortgage\Traits\HasMiscellaneousFees;
 use Homeful\Mortgage\Traits\HasContractPrice;
 use Homeful\Mortgage\Traits\HasDownPayment;
 use Homeful\Mortgage\Traits\HasMultipliers;
+use Homeful\Mortgage\Traits\HasAddOnFeesToLoanAmortization;
 use Illuminate\Support\Facades\Validator;
 use Homeful\Mortgage\Traits\HasProperty;
 use Homeful\Mortgage\Traits\HasBorrower;
@@ -58,6 +60,7 @@ final class Mortgage
     use HasPromos;
     use HasProperty;
     use HasTerms;
+    use HasAddOnFeesToLoanAmortization;
 
     /**
      * @throws \Brick\Math\Exception\NumberFormatException
@@ -76,6 +79,8 @@ final class Mortgage
             Input::CONSULTING_FEE => ['nullable', 'numeric', 'min:0.0', 'max:30000.0'],
             Input::DP_TERM => ['nullable', 'integer', 'min:1', 'max:24'],
             Input::LOW_CASH_OUT => ['nullable', 'numeric', 'min:0.0', 'max:100000.0'],
+            Input::MORTGAGE_REDEMPTION_INSURANCE =>  ['nullable', 'numeric', 'min:0.0', 'max:10000.0'],
+            Input::ANNUAL_FIRE_INSURANCE =>  ['nullable', 'numeric', 'min:0.0', 'max:10000.0'],
         ]);
 
         if (!isset($validated[Input::PERCENT_DP]))
@@ -117,6 +122,9 @@ final class Mortgage
         $dp_term = (int) Arr::get($params, Input::DP_TERM, 1);
         $low_cash_out = (float) Arr::get($params, Input::LOW_CASH_OUT, 0.0);
 
+        $this->mortgage_redemption_insurance = (float) Arr::get($params, Input::MORTGAGE_REDEMPTION_INSURANCE, 0.0);
+        $this->monthly_fire_insurance = (float) Arr::get($params, Input::ANNUAL_FIRE_INSURANCE, 0.0);
+
         $this
             ->setConsultingFee($consulting_fee)
             ->setPercentDownPayment($dp_percent)
@@ -128,6 +136,9 @@ final class Mortgage
 
         $this->addCashOut(new CashOut(name: Input::DOWN_PAYMENT, amount: $this->getDownPayment()->getPrincipal(), deductible: false));
         $this->addCashOut(new CashOut(name: Input::PARTIAL_MISCELLANEOUS_FEES, amount: $this->getPartialMiscellaneousFees(), deductible: false));
+
+//        $this->addAddOnFeeToLoanAmortization(new AddOnFeeToLoanAmortization(name: Input::MORTGAGE_REDEMPTION_INSURANCE, amount: $mortgage_redemption_insurance, deductible: false));
+//        $this->addAddOnFeeToLoanAmortization(new AddOnFeeToLoanAmortization(name: Input::ANNUAL_FIRE_INSURANCE, amount: $monthly_fire_insurance, deductible: false));
 
         return $this;
     }
@@ -159,12 +170,19 @@ final class Mortgage
         $balance_payment = $this->getBalancePayment()->inclusive();
         $loan = new Price($balance_payment->plus($balance_mf));
 
-        return (new Payment)
+        $payment = (new Payment)
             ->setPrincipal($loan)
             ->setTerm(new Term($this->getBalancePaymentTerm()))
             ->setInterestRate($this->getInterestRate())
             ->setPercentDisposableIncomeRequirement($this->getProperty()->getDisposableIncomeRequirementMultiplier())
             ;
+
+        if ($fees = $this->getAddOnFeesToLoanAmortization()) {
+            $payment->setAddOnFeesToPayment($fees);
+//            dd($payment->getTotalAddOnFeesToPayment()->inclusive()->getAmount()->toFloat());
+        }
+
+        return $payment;
     }
 
     //    public function getBalanceCashOut(): Price
@@ -221,16 +239,16 @@ final class Mortgage
         ]);
     }
 
-    public function getTotalCashOut(): Price
-    {
-        $total_cash_out = new Price(Money::of(0, 'PHP'));
-
-        $this->getCashOuts()->each(function (CashOut $cash_out) use ($total_cash_out) {
-            $total_cash_out->addModifier('cash out item', $cash_out->getAmount()->inclusive());
-        });
-
-        return $total_cash_out;
-    }
+//    public function getTotalCashOut(): Price
+//    {
+//        $total_cash_out = new Price(Money::of(0, 'PHP'));
+//
+//        $this->getCashOuts()->each(function (CashOut $cash_out) use ($total_cash_out) {
+//            $total_cash_out->addModifier('cash out item', $cash_out->getAmount()->inclusive());
+//        });
+//
+//        return $total_cash_out;
+//    }
 
     /**
      * @throws \Brick\Math\Exception\NumberFormatException

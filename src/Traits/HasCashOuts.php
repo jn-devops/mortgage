@@ -23,12 +23,16 @@ trait HasCashOuts
         return $this;
     }
 
+    /**
+     * @return Collection
+     */
     public function getCashOuts(): Collection
     {
         return $this->cashOuts;
     }
 
     /**
+     * @param Collection $cashOuts
      * @return HasCashOuts|Mortgage
      */
     public function setCashOuts(Collection $cashOuts): self
@@ -39,6 +43,7 @@ trait HasCashOuts
     }
 
     /**
+     * @param CashOut $cashOut
      * @return HasCashOuts|Mortgage
      */
     public function addCashOut(CashOut $cashOut): self
@@ -46,6 +51,23 @@ trait HasCashOuts
         $this->cashOuts->add($cashOut);
 
         return $this;
+    }
+
+    /**
+     * @return Price
+     * @throws \Brick\Math\Exception\NumberFormatException
+     * @throws \Brick\Math\Exception\RoundingNecessaryException
+     * @throws \Brick\Money\Exception\UnknownCurrencyException
+     */
+    public function getTotalCashOut(): Price
+    {
+        $total_cash_out = new Price(Money::of(0, 'PHP'));
+
+        $this->getCashOuts()->each(function (CashOut $cash_out) use ($total_cash_out) {
+            $total_cash_out->addModifier('cash out item', $cash_out->getAmount()->inclusive());
+        });
+
+        return $total_cash_out;
     }
 
     /**
@@ -63,6 +85,7 @@ trait HasCashOuts
     }
 
     /**
+     * @param Price|float $consulting_fee
      * @return Mortgage|HasCashOuts
      */
     public function setConsultingFee(Price|float $consulting_fee): self
