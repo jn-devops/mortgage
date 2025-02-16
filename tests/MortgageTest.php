@@ -326,6 +326,36 @@ dataset('sample-loan-computation', function () {
 
             Assert::BALANCE_CASH_OUT => 0.0
         ],
+//        16 Feb 2025 - HDG Formula PH and PP Example 1 but with relaxed 30% GMI requirement
+        fn () => [
+            Input::WAGES => 18000,
+            Input::TCP => 750000,
+            Input::PERCENT_DP => 0/100,
+            Input::DP_TERM => 1,
+            Input::BP_INTEREST_RATE => 6.25/100,
+            Input::PERCENT_MF => 0.0,
+            Input::BP_TERM => 14,
+
+            Input::MORTGAGE_REDEMPTION_INSURANCE => (750000 / 1000) * 0.225,
+            Input::ANNUAL_FIRE_INSURANCE => 750000 * 0.00212584,
+            Input::INCOME_REQUIREMENT_MULTIPLIER => 30/100,
+
+            Assert::MISCELLANEOUS_FEES => 0.0,
+            Assert::DOWN_PAYMENT => 0,
+            Assert::CASH_OUT => 0.0,
+            Assert::ADD_ON_FEES_TO_LOAN_AMORTIZATION => 301.62,
+            Assert::DOWN_PAYMENT_AMORTIZATION => 0,
+            Assert::LOAN_AMOUNT => 750000,
+            Assert::LOAN_AMORTIZATION => 7011.62,
+            Assert::PARTIAL_MISCELLANEOUS_FEES => 0.0,
+            Assert::INCOME_REQUIREMENT_MULTIPLIER => 30/100,
+            Assert::JOINT_DISPOSABLE_MONTHLY_INCOME => 6300.0,
+            Assert::INCOME_REQUIREMENT => 23372.07,
+            Assert::MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME => 704217.0 ,
+            Assert::LOAN_DIFFERENCE => 45783.0,
+
+            Assert::BALANCE_CASH_OUT => 0.0
+        ],
         //14 Feb 2025 - HDG Formula PH and PP Example 2
         fn () => [
             Input::WAGES => 18000,
@@ -684,7 +714,7 @@ it('computes different loan packages', function (array $params) {
 //        dd($mortgage->getPartialMiscellaneousFees()->inclusive()->getAmount()->toFloat());
         expect($mortgage->getPartialMiscellaneousFees()->inclusive()->compareTo($params[Assert::PARTIAL_MISCELLANEOUS_FEES]))->toBe(Amount::EQUAL);
         //        expect($mortgage->getIncomeRequirement()->compareTo($params[Assert::GROSS_MONTHLY_INCOME]))->toBe(Amount::EQUAL);
-        expect($mortgage->getProperty()->getDefaultDisposableIncomeRequirementMultiplier())->toBe($params[Assert::INCOME_REQUIREMENT_MULTIPLIER]);
+        expect($mortgage->getIncomeRequirement())->toBe($params[Assert::INCOME_REQUIREMENT_MULTIPLIER]);
 //                dd($mortgage->getDisposableMonthlyIncome()->inclusive()->getAmount()->toFloat());
 //        dd($mortgage->getJointBorrowerDisposableMonthlyIncome()->inclusive()->getAmount()->toFloat());
         expect($mortgage->getJointBorrowerDisposableMonthlyIncome()->inclusive()->compareTo($params[Assert::JOINT_DISPOSABLE_MONTHLY_INCOME]))->toBe(Amount::EQUAL);

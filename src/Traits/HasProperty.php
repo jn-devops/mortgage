@@ -9,6 +9,9 @@ trait HasProperty
 {
     protected Property $property;
 
+    /**
+     * @return Property
+     */
     public function getProperty(): Property
     {
         return $this->property;
@@ -17,6 +20,9 @@ trait HasProperty
     /**
      * @param Property $property
      * @return Mortgage|HasProperty
+     * @throws \Brick\Math\Exception\NumberFormatException
+     * @throws \Brick\Math\Exception\RoundingNecessaryException
+     * @throws \Brick\Money\Exception\UnknownCurrencyException
      */
     public function setProperty(Property $property): self
     {
@@ -36,6 +42,9 @@ trait HasProperty
         return $this->setContractPrice($this->property->getTotalContractPrice());
     }
 
+    /**
+     * @return Mortgage|HasProperty
+     */
     protected function updateBorrowerProperty(): self
     {
         if (isset($this->borrower)) {

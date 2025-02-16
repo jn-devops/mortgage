@@ -2,13 +2,12 @@
 
 namespace Homeful\Mortgage;
 
+use Homeful\Mortgage\Traits\HasAddOnFeesToLoanAmortization;
 use Homeful\Mortgage\Actions\CalculateLoanDifference;
-use Homeful\Mortgage\Classes\AddOnFeeToLoanAmortization;
 use Homeful\Mortgage\Traits\HasMiscellaneousFees;
 use Homeful\Mortgage\Traits\HasContractPrice;
 use Homeful\Mortgage\Traits\HasDownPayment;
 use Homeful\Mortgage\Traits\HasMultipliers;
-use Homeful\Mortgage\Traits\HasAddOnFeesToLoanAmortization;
 use Illuminate\Support\Facades\Validator;
 use Homeful\Mortgage\Traits\HasProperty;
 use Homeful\Mortgage\Traits\HasBorrower;
@@ -81,6 +80,7 @@ final class Mortgage
             Input::LOW_CASH_OUT => ['nullable', 'numeric', 'min:0.0', 'max:100000.0'],
             Input::MORTGAGE_REDEMPTION_INSURANCE =>  ['nullable', 'numeric', 'min:0.0', 'max:10000.0'],
             Input::ANNUAL_FIRE_INSURANCE =>  ['nullable', 'numeric', 'min:0.0', 'max:10000.0'],
+            Input::INCOME_REQUIREMENT_MULTIPLIER => ['nullable', 'numeric', 'min:0', 'max:1'],
         ]);
 
         if (!isset($validated[Input::PERCENT_DP]))
@@ -125,6 +125,8 @@ final class Mortgage
         $this->mortgage_redemption_insurance = (float) Arr::get($params, Input::MORTGAGE_REDEMPTION_INSURANCE, 0.0);
         $this->monthly_fire_insurance = (float) Arr::get($params, Input::ANNUAL_FIRE_INSURANCE, 0.0);
 
+        $income_requirement = Arr::get($params, Input::INCOME_REQUIREMENT_MULTIPLIER);
+
         $this
             ->setConsultingFee($consulting_fee)
             ->setPercentDownPayment($dp_percent)
@@ -132,13 +134,12 @@ final class Mortgage
             ->setInterestRate($bp_interest_rate)
             ->setPercentMiscellaneousFees($mf_percent)
             ->setDownPaymentTerm($dp_term)
-            ->setLowCashOut($low_cash_out);
+            ->setLowCashOut($low_cash_out)
+            ->setIncomeRequirement($income_requirement)
+        ;
 
         $this->addCashOut(new CashOut(name: Input::DOWN_PAYMENT, amount: $this->getDownPayment()->getPrincipal(), deductible: false));
         $this->addCashOut(new CashOut(name: Input::PARTIAL_MISCELLANEOUS_FEES, amount: $this->getPartialMiscellaneousFees(), deductible: false));
-
-//        $this->addAddOnFeeToLoanAmortization(new AddOnFeeToLoanAmortization(name: Input::MORTGAGE_REDEMPTION_INSURANCE, amount: $mortgage_redemption_insurance, deductible: false));
-//        $this->addAddOnFeeToLoanAmortization(new AddOnFeeToLoanAmortization(name: Input::ANNUAL_FIRE_INSURANCE, amount: $monthly_fire_insurance, deductible: false));
 
         return $this;
     }
@@ -174,12 +175,10 @@ final class Mortgage
             ->setPrincipal($loan)
             ->setTerm(new Term($this->getBalancePaymentTerm()))
             ->setInterestRate($this->getInterestRate())
-            ->setPercentDisposableIncomeRequirement($this->getProperty()->getDisposableIncomeRequirementMultiplier())
+            ->setPercentDisposableIncomeRequirement($this->getIncomeRequirement())
             ;
-
         if ($fees = $this->getAddOnFeesToLoanAmortization()) {
             $payment->setAddOnFeesToPayment($fees);
-//            dd($payment->getTotalAddOnFeesToPayment()->inclusive()->getAmount()->toFloat());
         }
 
         return $payment;

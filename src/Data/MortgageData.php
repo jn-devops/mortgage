@@ -50,7 +50,7 @@ class MortgageData extends Data
             loan_amount: $loan->getPrincipal()->inclusive()->getAmount()->toFloat(),
             loan_amortization: $loan->getMonthlyAmortization()->inclusive()->getAmount()->toFloat(),
             partial_miscellaneous_fees: $mortgage->getPartialMiscellaneousFees()->inclusive()->getAmount()->toFloat(),
-            income_requirement_multiplier: $mortgage->getProperty()->getDefaultDisposableIncomeRequirementMultiplier(),
+            income_requirement_multiplier: $mortgage->getIncomeRequirement(),
             joint_disposable_monthly_income: $mortgage->getJointBorrowerDisposableMonthlyIncome()->inclusive()->getAmount()->toFloat(),
             income_requirement: $mortgage->getLoan()->getIncomeRequirement()->getAmount()->toFloat(),
             present_value_from_monthly_disposable_income: $mortgage->getPresentValueFromMonthlyDisposableIncomePayments()->getDiscountedValue()->inclusive()->getAmount()->toFloat(),
