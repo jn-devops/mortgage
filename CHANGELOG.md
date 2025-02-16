@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.2.0 - 2025-02-16
+
+add custom income requirement multiplier
+
 ## #v1.1.0 - 2025-02-15
 
 add add on fees to loan amortization
