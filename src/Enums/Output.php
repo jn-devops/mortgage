@@ -2,6 +2,7 @@
 
 namespace Homeful\Mortgage\Enums;
 
+/** @deprecated  */
 enum Output
 {
     case AsPrice;

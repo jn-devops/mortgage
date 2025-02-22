@@ -2,4 +2,7 @@
 
 namespace Homeful\Mortgage\Classes;
 
-class CashOut extends MortgageCollectionItem{}
+use Homeful\Common\Classes\AddOnFeeToPayment;
+
+/** @deprecated  */
+class CashOut extends AddOnFeeToPayment{}
