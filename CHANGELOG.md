@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.2.2 - 2025-02-23
+
+update dp_amortization
+
 ## #v1.2.1 - 2025-02-23
 
 update mortgage - processing fee substracted from down payment, no more partial miscellaneous fees
