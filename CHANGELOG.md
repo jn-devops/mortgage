@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.2.1 - 2025-02-23
+
+update mortgage - processing fee substracted from down payment, no more partial miscellaneous fees
+
 ## #v1.2.0 - 2025-02-16
 
 add custom income requirement multiplier
