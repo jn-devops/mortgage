@@ -29,6 +29,7 @@ class MortgageData extends Data
         public float $income_requirement,
         public float $present_value_from_monthly_disposable_income,
         public float $loan_difference,
+        public float $balance_payment
     ) {}
 
     public static function fromObject(Mortgage $mortgage): MortgageData
@@ -54,7 +55,8 @@ class MortgageData extends Data
             joint_disposable_monthly_income: $mortgage->getJointBorrowerDisposableMonthlyIncome()->inclusive()->getAmount()->toFloat(),
             income_requirement: $mortgage->getLoan()->getIncomeRequirement()->getAmount()->toFloat(),
             present_value_from_monthly_disposable_income: $mortgage->getPresentValueFromMonthlyDisposableIncomePayments()->getDiscountedValue()->inclusive()->getAmount()->toFloat(),
-            loan_difference: $mortgage->getLoanDifference()->inclusive()->getAmount()->toFloat()
+            loan_difference: $mortgage->getLoanDifference()->inclusive()->getAmount()->toFloat(),
+            balance_payment: $mortgage->getBalancePayment()->inclusive()->getAmount()->toFloat()
         );
     }
 }
