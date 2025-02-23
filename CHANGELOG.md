@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.2.4 - 2025-02-23
+
+add balance payment to data
+
 ## #v1.2.3 - 2025-02-23
 
 fix the dp amortization update
