@@ -28,6 +28,8 @@ use Illuminate\Support\Arr;
 use Whitecube\Price\Price;
 use Brick\Money\Money;
 use Homeful\Borrower\Exceptions\BirthdateNotSet;
+use Homeful\Common\Classes\{AddOnFeeToPayment, AmountCollectionItem, DeductibleFeeFromPayment};
+use Homeful\Mortgage\Enums\Account;
 
 /**
  * Class Mortgage
@@ -46,20 +48,24 @@ use Homeful\Borrower\Exceptions\BirthdateNotSet;
  * @method Price getBalanceMiscellaneousFees()
  * @method int getBalancePaymentTerm()
  * @method Mortgage setBalancePaymentTerm(int $balance_payment_term)
+ * @method Price getConsultingFee()
+ * @method Mortgage setConsultingFee(Price|float $consulting_fee)
+ * @method Price getProcessingFee()
+ * @method Mortgage setProcessingFee(Price|float $processing_fee)
  */
 final class Mortgage
 {
+    use HasAddOnFeesToLoanAmortization;
+    use HasMiscellaneousFees;
+    use HasContractPrice;
+    use HasDownPayment;
+    use HasMultipliers;
+    use HasProperty;
     use HasBorrower;
     use HasCashOuts;
     use HasConfig;
-    use HasContractPrice;
-    use HasDownPayment;
-    use HasMiscellaneousFees;
-    use HasMultipliers;
     use HasPromos;
-    use HasProperty;
     use HasTerms;
-    use HasAddOnFeesToLoanAmortization;
 
     /**
      * @throws \Brick\Math\Exception\NumberFormatException
@@ -68,7 +74,9 @@ final class Mortgage
      */
     public function __construct(Property $property, Borrower $borrower, array $params)
     {
-        $this->initCashOuts()->setBorrower($borrower)->setProperty($property);
+        $this->initCashOuts();
+        $this->setBorrower($borrower);
+        $this->setProperty($property);
 
         $validated = Validator::validate($params, [
             Input::PERCENT_DP => ['nullable', 'numeric', 'min:0', 'max:1'],
@@ -76,6 +84,7 @@ final class Mortgage
             Input::BP_INTEREST_RATE => ['nullable', 'numeric', 'min:0', 'max:1'],
             Input::PERCENT_MF => ['nullable', 'numeric', 'min:0', 'max:1'],
             Input::CONSULTING_FEE => ['nullable', 'numeric', 'min:0.0', 'max:30000.0'],
+            Input::PROCESSING_FEE => ['nullable', 'numeric', 'min:0.0', 'max:30000.0'],
             Input::DP_TERM => ['nullable', 'integer', 'min:1', 'max:24'],
             Input::LOW_CASH_OUT => ['nullable', 'numeric', 'min:0.0', 'max:100000.0'],
             Input::MORTGAGE_REDEMPTION_INSURANCE =>  ['nullable', 'numeric', 'min:0.0', 'max:10000.0'],
@@ -115,6 +124,7 @@ final class Mortgage
     public function update(array $params): self
     {
         $consulting_fee = (float) Arr::get($params, Input::CONSULTING_FEE, 0.0);
+        $processing_fee = (float) Arr::get($params, Input::PROCESSING_FEE, 0.0);
         $dp_percent = (float) Arr::get($params, Input::PERCENT_DP, 0.0);
         $bp_term = (int) Arr::get($params, Input::BP_TERM, 1);
         $bp_interest_rate = (float) Arr::get($params, Input::BP_INTEREST_RATE, 0.0);
@@ -126,9 +136,10 @@ final class Mortgage
         $this->monthly_fire_insurance = (float) Arr::get($params, Input::ANNUAL_FIRE_INSURANCE, 0.0);
 
         $income_requirement = Arr::get($params, Input::INCOME_REQUIREMENT_MULTIPLIER);
-
+//        $consulting_fee = 1000;
         $this
             ->setConsultingFee($consulting_fee)
+            ->setProcessingFee($processing_fee)
             ->setPercentDownPayment($dp_percent)
             ->setBalancepaymentTerm($bp_term)
             ->setInterestRate($bp_interest_rate)
@@ -138,9 +149,9 @@ final class Mortgage
             ->setIncomeRequirement($income_requirement)
         ;
 
-        $this->addCashOut(new CashOut(name: Input::DOWN_PAYMENT, amount: $this->getDownPayment()->getPrincipal(), deductible: false));
-        $this->addCashOut(new CashOut(name: Input::PARTIAL_MISCELLANEOUS_FEES, amount: $this->getPartialMiscellaneousFees(), deductible: false));
-
+        $this->addCashOut(new AddOnFeeToPayment(name: Input::DOWN_PAYMENT, amount: $this->getDownPayment()->getPrincipal(), tag: Account::CASH_OUT->value));
+        $this->addCashOut(new AddOnFeeToPayment(name: Input::PARTIAL_MISCELLANEOUS_FEES, amount: $this->getPartialMiscellaneousFees(), tag: Account::CASH_OUT->value));
+//dd($this->getConsultingFee());
         return $this;
     }
 
@@ -167,9 +178,11 @@ final class Mortgage
      */
     public function getLoan(): Payment
     {
-        $balance_mf = $this->getBalanceMiscellaneousFees()->inclusive();
+//        $balance_mf = $this->getBalanceMiscellaneousFees()->inclusive();
         $balance_payment = $this->getBalancePayment()->inclusive();
-        $loan = new Price($balance_payment->plus($balance_mf));
+//        $loan = new Price($balance_payment->plus($balance_mf));
+        $mf = $this->getMiscellaneousFees()->inclusive();
+        $loan = new Price($balance_payment->plus($mf));
 
         $payment = (new Payment)
             ->setPrincipal($loan)
@@ -209,7 +222,7 @@ final class Mortgage
      */
     public function isPromotional(): bool
     {
-        $deductible_cash_outs = $this->getCashOuts()->sum(function (CashOut $cash_out) {
+        $deductible_cash_outs = $this->getCashOuts()->sum(function (AmountCollectionItem $cash_out) {
             return $cash_out->getAmount()->inclusive()->getAmount()->toFloat();
         });
 

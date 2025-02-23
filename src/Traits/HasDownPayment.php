@@ -14,6 +14,7 @@ use Homeful\Payment\Enums\Cycle;
 use Homeful\Payment\Class\Term;
 use Homeful\Mortgage\Mortgage;
 use Homeful\Payment\Payment;
+use Homeful\Common\Classes\AmountCollectionItem;
 
 trait HasDownPayment
 {
@@ -87,5 +88,20 @@ trait HasDownPayment
         DownPaymentUpdated::dispatch($this);
 
         return $this;
+    }
+
+    public function getBalanceDownPayment(): Payment
+    {
+        $payment = $this->getDownPayment()->getPrincipal()->inclusive()->getAmount()->toFloat();
+        $term = $this->getDownPaymentTerm();
+
+        $down_payment_cash_out = $this->getCashOuts()
+            ->filter(fn(AmountCollectionItem $cash_out) => $cash_out->getTag() === 'down_payment')
+            ->sum(fn(AmountCollectionItem $cash_out) => $cash_out->getAmount()->inclusive()->getAmount()->toFloat());
+        $balance_down_payment = $payment - $down_payment_cash_out;
+
+        return (new Payment)
+            ->setPrincipal($balance_down_payment)
+            ->setTerm(new Term($term, Cycle::Monthly));
     }
 }
