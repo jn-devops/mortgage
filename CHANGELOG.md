@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.2.3 - 2025-02-23
+
+fix the dp amortization update
+
 ## #v1.2.2 - 2025-02-23
 
 update dp_amortization
