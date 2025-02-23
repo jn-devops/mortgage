@@ -263,7 +263,7 @@ dataset('sample-loan-computation', function () {
             Assert::BALANCE_PAYMENT => 3104000.0,
             Assert::DOWN_PAYMENT => 96000.0,
             Assert::BALANCE_DOWN_PAYMENT => 86000.0,
-            Assert::CASH_OUT => 102720.0 + $processing_fee,
+            Assert::CASH_OUT => 10000.0,
             Assert::ADD_ON_FEES_TO_LOAN_AMORTIZATION => 0.0,
             Assert::DOWN_PAYMENT_AMORTIZATION => 14333.34,
             Assert::LOAN_AMOUNT => 3328000.0,
@@ -287,13 +287,13 @@ dataset('sample-loan-computation', function () {
             Input::PERCENT_MF => 7/100,
             Input::BP_TERM => 29,
 
-            Input::PROCESSING_FEE => $processing_fee = 10000,
+            Input::PROCESSING_FEE => 10000.0,
 
             Assert::MISCELLANEOUS_FEES => 224000.0,
             Assert::BALANCE_PAYMENT => 3104000.0,
             Assert::DOWN_PAYMENT => 96000.0,
             Assert::BALANCE_DOWN_PAYMENT => 86000.0,
-            Assert::CASH_OUT => 102720.0 + $processing_fee,
+            Assert::CASH_OUT => 10000.0,
             Assert::ADD_ON_FEES_TO_LOAN_AMORTIZATION => 0.0,
             Assert::DOWN_PAYMENT_AMORTIZATION => 14333.34,
             Assert::LOAN_AMOUNT => 3328000.0,
@@ -813,7 +813,7 @@ it('computes different loan packages', function (array $params) {
 //        dd($mortgage->getLoanDifference()->inclusive()->getAmount()->toFloat(), $params[Assert::LOAN_DIFFERENCE]);
         expect($mortgage->getLoanDifference()->inclusive()->compareTo($params[Assert::LOAN_DIFFERENCE]))->toBe(Amount::EQUAL);
 //        dd($mortgage->getTotalCashOut(Account::CASH_OUT)->inclusive()->getAmount()->toFloat())->toBe($params[Assert::CASH_OUT]);
-//        expect($mortgage->getTotalCashOut()->inclusive()->getAmount()->toFloat())->toBe($params[Assert::CASH_OUT]);
+        expect($mortgage->getTotalCashOut()->inclusive()->getAmount()->toFloat())->toBe($params[Assert::CASH_OUT]);
 //        expect($mortgage->getTotalAddOnFeesToLoanAmortization()->inclusive()->getAmount()->toFloat())->toBe($params[Assert::ADD_ON_FEES_TO_LOAN_AMORTIZATION]);
     });
 })->with('sample-loan-computation');
@@ -1003,7 +1003,7 @@ it('has mortgage data', function (array $params) {
         expect($data->miscellaneous_fees)->toBe((float) $params[Assert::MISCELLANEOUS_FEES]);
         expect($data->down_payment)->toBe((float) $mortgage->getDownPayment()->getPrincipal()->inclusive()->getAmount()->toFloat());
         expect($data->cash_out)->toBe((float) $params[Assert::CASH_OUT]);
-        expect($data->dp_amortization)->toBe((float) $mortgage->getDownPayment()->getMonthlyAmortization()->inclusive()->getAmount()->toFloat());
+        expect($data->dp_amortization)->toBe((float) $mortgage->getBalanceDownPayment()->getMonthlyAmortization()->inclusive()->getAmount()->toFloat());
         expect($data->loan_amount)->toBe((float) $params[Assert::LOAN_AMOUNT]);
         expect($data->loan_amortization)->toBe((float) $params[Assert::LOAN_AMORTIZATION]);
         expect($data->partial_miscellaneous_fees)->toBe((float) $params[Assert::PARTIAL_MISCELLANEOUS_FEES]);

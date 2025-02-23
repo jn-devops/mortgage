@@ -149,9 +149,9 @@ final class Mortgage
             ->setIncomeRequirement($income_requirement)
         ;
 
-        $this->addCashOut(new AddOnFeeToPayment(name: Input::DOWN_PAYMENT, amount: $this->getDownPayment()->getPrincipal(), tag: Account::CASH_OUT->value));
-        $this->addCashOut(new AddOnFeeToPayment(name: Input::PARTIAL_MISCELLANEOUS_FEES, amount: $this->getPartialMiscellaneousFees(), tag: Account::CASH_OUT->value));
-//dd($this->getConsultingFee());
+//        $this->addCashOut(new AddOnFeeToPayment(name: Input::DOWN_PAYMENT, amount: $this->getDownPayment()->getPrincipal(), tag: Account::CASH_OUT->value));
+//        $this->addCashOut(new AddOnFeeToPayment(name: Input::PARTIAL_MISCELLANEOUS_FEES, amount: $this->getPartialMiscellaneousFees(), tag: Account::CASH_OUT->value));
+
         return $this;
     }
 
