@@ -44,7 +44,7 @@ class MortgageData extends Data
             percent_mf: $mortgage->getPercentMiscellaneousFees(),
             bp_term: $mortgage->getBalancePaymentTerm(),
             miscellaneous_fees: $mortgage->getMiscellaneousFees()->inclusive()->getAmount()->toFloat(),
-            down_payment: $mortgage->getDownPayment()->getPrincipal()->inclusive()->getAmount()->toFloat(),
+            down_payment: $mortgage->getBalanceDownPayment()->getPrincipal()->inclusive()->getAmount()->toFloat(),
             cash_out: $mortgage->getTotalCashOut()->inclusive()->getAmount()->toFloat(),
             dp_amortization: $mortgage->getDownPayment()->getMonthlyAmortization()->inclusive()->getAmount()->toFloat(),
             loan_amount: $loan->getPrincipal()->inclusive()->getAmount()->toFloat(),
