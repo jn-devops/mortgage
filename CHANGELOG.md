@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.2.6 - 2025-02-24
+
+make balance down payment non negative
+
 ## #v1.2.5 - 2025-02-23
 
 remove down payment and partial mf from cash out
