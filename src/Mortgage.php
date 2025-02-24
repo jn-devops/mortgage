@@ -269,7 +269,7 @@ final class Mortgage
      * @throws \Homeful\Borrower\Exceptions\MaximumBorrowingAgeBreached
      * @throws \Homeful\Borrower\Exceptions\MinimumBorrowingAgeNotMet
      */
-    public static function createWithTypicalBorrower(Property $property, array $params): Mortgage
+    public static function createWithTypicalBorrower(Property $property, array $params, ?int $age = null): Mortgage
     {
         $tcp = ($property->getTotalContractPrice()->inclusive()->getAmount()->toFloat() * (1.085)) * .95;
 
@@ -280,7 +280,8 @@ final class Mortgage
             })->inclusive();
 
         $disposable_income_requirement = $disposable_income_requirement instanceof Money ? $disposable_income_requirement : null;
-        $birthdate_from_default_age = Carbon::now()->addYears(-1 * self::getDefaultAge());
+        $age = $age ?: self::getDefaultAge();
+        $birthdate_from_default_age = Carbon::now()->addYears(-1 * $age);
         $borrower = (new Borrower)->setGrossMonthlyIncome($disposable_income_requirement)->setBirthdate($birthdate_from_default_age);
         return new self($property, $borrower, $params);
     }
