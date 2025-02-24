@@ -98,7 +98,8 @@ trait HasDownPayment
         $down_payment_cash_out = $this->getCashOuts()
             ->filter(fn(AmountCollectionItem $cash_out) => $cash_out->getTag() === 'down_payment')
             ->sum(fn(AmountCollectionItem $cash_out) => $cash_out->getAmount()->inclusive()->getAmount()->toFloat());
-        $balance_down_payment = $payment - $down_payment_cash_out;
+//        $balance_down_payment = $payment - $down_payment_cash_out;
+        $balance_down_payment = max(0, $payment - $down_payment_cash_out);
 
         return (new Payment)
             ->setPrincipal($balance_down_payment)
