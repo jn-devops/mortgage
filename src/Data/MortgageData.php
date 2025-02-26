@@ -9,11 +9,14 @@ use Spatie\LaravelData\Data;
 
 class MortgageData extends Data
 {
+    public float $percent_balance_payment;
+
     public function __construct(
         public BorrowerData $borrower,
         public PropertyData $property,
         public float $percent_down_payment,
         public float $dp_term,
+        public float $balance_down_payment,
         public float $bp_interest_rate,
         public float $percent_mf,
         public float $bp_term,
@@ -30,7 +33,9 @@ class MortgageData extends Data
         public float $present_value_from_monthly_disposable_income,
         public float $loan_difference,
         public float $balance_payment
-    ) {}
+    ) {
+        $this->percent_balance_payment = 1 - $this->percent_down_payment;
+    }
 
     public static function fromObject(Mortgage $mortgage): MortgageData
     {
@@ -40,6 +45,7 @@ class MortgageData extends Data
             borrower: BorrowerData::fromObject($mortgage->getBorrower()),
             property: PropertyData::fromObject($mortgage->getProperty()),
             percent_down_payment: $mortgage->getPercentDownPayment(),
+            balance_down_payment: $mortgage->getBalanceDownPayment()->getPrincipal()->inclusive()->getAmount()->toFloat(),
             dp_term: $mortgage->getDownPaymentTerm(),
             bp_interest_rate: $mortgage->getInterestRate(),
             percent_mf: $mortgage->getPercentMiscellaneousFees(),
