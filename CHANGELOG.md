@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.2.82 - 2025-02-27
+
+add bp term in months computed property
+
 ## #v1.2.81 - 2025-02-27
 
 update setIncomeRequirement
