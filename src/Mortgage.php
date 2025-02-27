@@ -231,7 +231,7 @@ final class Mortgage
 
     public function getJointBorrowerDisposableMonthlyIncome(): Price
     {
-        return $this->getBorrower()->getJointMonthlyDisposableIncome($this->property);
+        return $this->getBorrower()->getJointMonthlyDisposableIncome();
     }
 
     public function getPresentValueFromMonthlyDisposableIncomePayments(): PresentValue

@@ -28,14 +28,17 @@ trait HasMultipliers
 
     public function setIncomeRequirement(?float $income_requirement = null): self
     {
-        $this->income_requirement = $income_requirement;
+//        $this->income_requirement = $income_requirement;
+        if ($income_requirement)
+            $this->getBorrower()->setDisposableIncomeMultiplier($income_requirement);
 
         return $this;
     }
 
     public function getIncomeRequirement(): ?float
     {
+        return $this->getBorrower()->getDisposableIncomeMultiplier();//TODO: maybe check default required dispoable income multiplier
         // Return the income requirement if set, otherwise return the disposable income requirement multiplier from the property
-        return $this->income_requirement ?? $this->getProperty()?->getDisposableIncomeRequirementMultiplier();
+//        return $this->income_requirement ?? $this->getProperty()?->getDisposableIncomeRequirementMultiplier();
     }
 }
