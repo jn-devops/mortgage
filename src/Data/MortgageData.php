@@ -10,6 +10,7 @@ use Spatie\LaravelData\Data;
 class MortgageData extends Data
 {
     public float $percent_balance_payment;
+    public float $bp_term_in_months;
 
     public function __construct(
         public BorrowerData $borrower,
@@ -35,6 +36,7 @@ class MortgageData extends Data
         public float $balance_payment
     ) {
         $this->percent_balance_payment = 1 - $this->percent_down_payment;
+        $this->bp_term_in_months = 12 * $this->bp_term;
     }
 
     public static function fromObject(Mortgage $mortgage): MortgageData

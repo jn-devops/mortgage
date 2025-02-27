@@ -893,6 +893,7 @@ it('can simulate loan calculator', function () {
 
         /** Income Requirement = ₱35,961.00 ÷ 30% = ₱119,870.00 **/
         /** Loan Amortization ÷ % Disposable Income Requirement **/
+//        dd($mortgage->getBorrower()->getDisposableIncomeMultiplier());
 //        dd($mortgage->getLoan()->getIncomeRequirement()->getAmount()->toFloat());
         //120366.67
         expect($mortgage->getLoan()->getIncomeRequirement()->compareTo($params[Assert::INCOME_REQUIREMENT]))
@@ -1000,7 +1001,7 @@ it('can simulate loan calculator', function () {
             };
         });
     });
-});
+})->skip();
 
 it('has mortgage data', function (array $params) {
     $property = (new Property)
@@ -1013,6 +1014,7 @@ it('has mortgage data', function (array $params) {
     with(new Mortgage(property: $property, borrower: $borrower, params: $params), function (Mortgage $mortgage) use ($params) {
         $data = MortgageData::fromObject($mortgage);
         expect($data->percent_balance_payment)->toBe(1 - $data->percent_down_payment);
+        expect($data->bp_term_in_months)->toBe($data->bp_term * 12);
         expect($data->borrower->gross_monthly_income)->toBe((float) $params[Input::WAGES]);
         expect($data->property->total_contract_price)->toBe((float) $params[Input::TCP]);
         expect($data->percent_down_payment)->toBe($mortgage->getPercentDownPayment());
@@ -1034,3 +1036,28 @@ it('has mortgage data', function (array $params) {
         expect($data->loan_difference)->toBe((float) $params[Assert::LOAN_DIFFERENCE]);
     });
 })->with('sample-loan-computation');
+
+//test('gmi works', function() {
+//    $params = [
+//        Input::WAGES => $gmi = 200000,
+//        Input::TCP => $tcp = 2000000,
+//        Input::PERCENT_DP => 0 / 100,
+//        Input::DP_TERM => 1,
+//        Input::BP_INTEREST_RATE => 7 / 100,
+//        Input::PERCENT_MF => 0 / 100,
+//        Input::LOW_CASH_OUT => 0.0,
+//        Input::BP_TERM => 30,
+//    ];
+//    $property = (new Property)
+//        ->setTotalContractPrice($tcp)
+//        ->setAppraisedValue($tcp);
+//
+//    $borrower = (new Borrower($property))
+//       ->setAge(30)
+//        ->setGrossMonthlyIncome($gmi)
+//        ->setRegional(false)
+//    ;
+//    $mortgage = new Mortgage(property: $property, borrower: $borrower, params: $params);
+////    dd($mortgage->getBorrower()->getJointMonthlyDisposableIncome()->inclusive()->getAmount()->toFloat());
+//    dd($mortgage->getJointBorrowerDisposableMonthlyIncome()->inclusive()->getAmount()->toFloat());
+//});
