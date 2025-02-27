@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.2.81 - 2025-02-27
+
+update setIncomeRequirement
+
 ## #v1.2.8 - 2025-02-26
 
 add percent_balance_payment to mortgage data
