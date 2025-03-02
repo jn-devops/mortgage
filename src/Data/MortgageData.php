@@ -3,8 +3,10 @@
 namespace Homeful\Mortgage\Data;
 
 use Homeful\Borrower\Data\BorrowerData;
+use Homeful\Payment\Data\PaymentData;
 use Homeful\Property\Data\PropertyData;
 use Homeful\Mortgage\Mortgage;
+use Illuminate\Support\Optional;
 use Spatie\LaravelData\Data;
 
 class MortgageData extends Data
@@ -34,7 +36,8 @@ class MortgageData extends Data
         public float $income_requirement,
         public float $present_value_from_monthly_disposable_income,
         public float $loan_difference,
-        public float $balance_payment
+        public float $balance_payment,
+        public PaymentData|Optional $loan
     ) {
         $this->percent_balance_payment = 1 - $this->percent_down_payment;
         $this->bp_term_in_months = 12 * $this->bp_term;
@@ -66,7 +69,8 @@ class MortgageData extends Data
             income_requirement: $mortgage->getLoan()->getIncomeRequirement()->getAmount()->toFloat(),
             present_value_from_monthly_disposable_income: $mortgage->getPresentValueFromMonthlyDisposableIncomePayments()->getDiscountedValue()->inclusive()->getAmount()->toFloat(),
             loan_difference: $mortgage->getLoanDifference()->inclusive()->getAmount()->toFloat(),
-            balance_payment: $mortgage->getBalancePayment()->inclusive()->getAmount()->toFloat()
+            balance_payment: $mortgage->getBalancePayment()->inclusive()->getAmount()->toFloat(),
+            loan: PaymentData::fromObject($mortgage->getLoan())
         );
     }
 }

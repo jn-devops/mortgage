@@ -3,6 +3,7 @@
 use Homeful\Common\Classes\AmountCollectionItem;
 use Homeful\Property\Enums\MarketSegment;
 use Homeful\Mortgage\Data\MortgageData;
+use Homeful\Payment\Data\PaymentData;
 use Homeful\Mortgage\Classes\CashOut;
 use Homeful\Common\Classes\Amount;
 use Homeful\Common\Classes\Assert;
@@ -813,7 +814,6 @@ it('computes different loan packages', function (array $params) {
         expect($data->loan_amortization)->toBe($params[Assert::LOAN_AMORTIZATION]);
 
         expect($mortgage->getLoan()->getTotalAddOnFeesToPayment()->inclusive()->getAmount()->toFloat())->toBe($params[Assert::ADD_ON_FEES_TO_PAYMENT]);
-
 //        dd($mortgage->getPartialMiscellaneousFees()->inclusive()->getAmount()->toFloat());
 
         expect($mortgage->getPartialMiscellaneousFees()->inclusive()->compareTo($params[Assert::PARTIAL_MISCELLANEOUS_FEES]))->toBe(Amount::EQUAL);
@@ -1038,6 +1038,7 @@ it('has mortgage data', function (array $params) {
 //        dd($data->present_value_from_monthly_disposable_income);
         expect($data->present_value_from_monthly_disposable_income)->toBe($params[Assert::MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME]);
         expect($data->loan_difference)->toBe((float) $params[Assert::LOAN_DIFFERENCE]);
+        expect($data->loan)->toBeInstanceOf(PaymentData::class);
     });
 })->with('sample-loan-computation');
 
