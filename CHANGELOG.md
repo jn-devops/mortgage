@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.2.85 - 2025-03-02
+
+add fees automatically to monthly amortization
+
 ## #v1.2.84 - 2025-03-02
 
 add loan data to mortgage data
