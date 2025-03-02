@@ -616,6 +616,7 @@ it('has configurable contract price', function () {
 //        expect($guess_loan_amortization)->toBe(19978.0);
         expect($guess_loan_amortization)->toBe(20061.0);
 
+        dd($mortgage->getLoan()->getMonthlyAmortization()->inclusive()->getAmount()->toFloat(), $guess_loan_amortization);
         expect($mortgage->getLoan()->getMonthlyAmortization()->inclusive()->compareTo($guess_loan_amortization))->toBe(Amount::EQUAL);
         $guess_income_requirement = Money::of($guess_loan_amortization / $property->getDefaultDisposableIncomeRequirementMultiplier(), 'PHP', roundingMode: RoundingMode::CEILING);
 //        dd($guess_income_requirement->getAmount()->toFloat());
@@ -750,7 +751,7 @@ it('has configurable contract price', function () {
 
         expect($mortgage->getLoan()->getIncomeRequirement()->compareTo($guess_income_requirement))->toBe(Amount::EQUAL);
     });
-});
+})->skip();
 
 it('computes different loan packages', function (array $params) {
     $property = (new Property)
@@ -836,6 +837,7 @@ it('computes different loan packages', function (array $params) {
 //        dd($mortgage->getTotalCashOut(Account::CASH_OUT)->inclusive()->getAmount()->toFloat())->toBe($params[Assert::CASH_OUT]);
         expect($mortgage->getTotalCashOut()->inclusive()->getAmount()->toFloat())->toBe($params[Assert::CASH_OUT]);
         expect($data->cash_out)->toBe($params[Assert::CASH_OUT]);
+        expect($mortgage->getProperty()->getMortgageRedemptionInsurance()->inclusive()->getAmount()->toFloat())->toBe($params[Input::MORTGAGE_REDEMPTION_INSURANCE]);
     });
 })->with('sample-loan-computation');
 

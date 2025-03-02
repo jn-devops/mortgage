@@ -132,8 +132,13 @@ final class Mortgage
         $dp_term = (int) Arr::get($params, Input::DP_TERM, 1);
         $low_cash_out = (float) Arr::get($params, Input::LOW_CASH_OUT, 0.0);
 
-        $this->mortgage_redemption_insurance = (float) Arr::get($params, Input::MORTGAGE_REDEMPTION_INSURANCE, 0.0);
-        $this->monthly_fire_insurance = (float) Arr::get($params, Input::ANNUAL_FIRE_INSURANCE, 0.0);
+        $mri = $this->getProperty()->getMortgageRedemptionInsurance()->inclusive()->getAmount()->toFloat();
+        $this->mortgage_redemption_insurance = $mri;
+//        $this->mortgage_redemption_insurance = (float) Arr::get($params, Input::MORTGAGE_REDEMPTION_INSURANCE, 0.0);
+
+        $fi = $this->getProperty()->getAnnualFireInsurance()->inclusive()->getAmount()->toFloat();
+        $this->monthly_fire_insurance = $fi;
+//        $this->monthly_fire_insurance = (float) Arr::get($params, Input::ANNUAL_FIRE_INSURANCE, 0.0);
 
         $income_requirement = Arr::get($params, Input::INCOME_REQUIREMENT_MULTIPLIER);
 //        $consulting_fee = 1000;
