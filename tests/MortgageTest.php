@@ -325,7 +325,7 @@ dataset('sample-loan-computation', function () {
             Assert::DOWN_PAYMENT => 0.0,
             Assert::BALANCE_DOWN_PAYMENT => 0.0,
             Assert::CASH_OUT => 0.0,
-            Assert::ADD_ON_FEES_TO_LOAN_AMORTIZATION => 301.62,
+            Assert::ADD_ON_FEES_TO_PAYMENT => 301.62,
             Assert::DOWN_PAYMENT_AMORTIZATION => 0.0,
             Assert::LOAN_AMOUNT => 750000.0,
             Assert::LOAN_AMORTIZATION => 7011.62,
@@ -370,37 +370,37 @@ dataset('sample-loan-computation', function () {
 //
 //            Assert::BALANCE_CASH_OUT => 0.0
 //        ],
-//        //14 Feb 2025 - HDG Formula PH and PP Example 2
-//        fn () => [
-//            Input::WAGES => 18000,
-//            Input::TCP => 750000,
-//            Input::PERCENT_DP => 0/100,
-//            Input::DP_TERM => 1,
-//            Input::BP_INTEREST_RATE => 6.25/100,
-//            Input::PERCENT_MF => 0,
-//            Input::BP_TERM => 29,
-//
-//            Input::MORTGAGE_REDEMPTION_INSURANCE => (750000 / 1000) * 0.225,
-//            Input::ANNUAL_FIRE_INSURANCE => 750000 * 0.00212584,
-//
-//            Assert::MISCELLANEOUS_FEES => 0.0,
-//            Assert::BALANCE_PAYMENT => 750000.0,
-//            Assert::DOWN_PAYMENT => 0,
-//            Assert::BALANCE_DOWN_PAYMENT => 0.0,
-//            Assert::CASH_OUT => 0.0,
-//            Assert::ADD_ON_FEES_TO_LOAN_AMORTIZATION => 301.62,
-//            Assert::DOWN_PAYMENT_AMORTIZATION => 0.0,
-//            Assert::LOAN_AMOUNT => 750000.0,
-//            Assert::LOAN_AMORTIZATION => 4974.62,
-//            Assert::PARTIAL_MISCELLANEOUS_FEES => 0.0, //301.62,
-//            Assert::INCOME_REQUIREMENT_MULTIPLIER => 35/100,
-//            Assert::JOINT_DISPOSABLE_MONTHLY_INCOME => 6300.0,
-//            Assert::INCOME_REQUIREMENT => 14213.2,//13382.86,
-//            Assert::MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME => 1011207.0 ,
-//            Assert::LOAN_DIFFERENCE => -261207.0,
-//
-//            Assert::BALANCE_CASH_OUT => 0.0
-//        ],
+        //14 Feb 2025 - HDG Formula PH and PP Example 2
+        fn () => [
+            Input::WAGES => 18000,
+            Input::TCP => 750000.0,
+            Input::PERCENT_DP => 0/100,
+            Input::DP_TERM => 1,
+            Input::BP_INTEREST_RATE => 6.25/100,
+            Input::PERCENT_MF => 0,
+            Input::BP_TERM => 29,
+
+            Input::MORTGAGE_REDEMPTION_INSURANCE => (750000 / 1000) * 0.225,
+            Input::ANNUAL_FIRE_INSURANCE => 750000 * 0.00212584,
+
+            Assert::MISCELLANEOUS_FEES => 0.0,
+            Assert::BALANCE_PAYMENT => 750000.0,
+            Assert::DOWN_PAYMENT => 0.0,
+            Assert::BALANCE_DOWN_PAYMENT => 0.0,
+            Assert::CASH_OUT => 0.0,
+            Assert::ADD_ON_FEES_TO_PAYMENT => 301.62,
+            Assert::DOWN_PAYMENT_AMORTIZATION => 0.0,
+            Assert::LOAN_AMOUNT => 750000.0,
+            Assert::LOAN_AMORTIZATION => 4974.62,
+            Assert::PARTIAL_MISCELLANEOUS_FEES => 0.0, //301.62,
+            Assert::INCOME_REQUIREMENT_MULTIPLIER => 35/100,
+            Assert::JOINT_DISPOSABLE_MONTHLY_INCOME => 6300.0,
+            Assert::INCOME_REQUIREMENT => 14213.2,//13382.86,
+            Assert::MAXIMUM_PAYMENT_FROM_MONTHLY_INCOME => 1011207.0 ,
+            Assert::LOAN_DIFFERENCE => -261207.0,
+
+            Assert::BALANCE_CASH_OUT => 0.0
+        ],
 //        //14 Feb 2025 - HDG Formula PV Example 1
 //        fn () => [
 //            Input::WAGES => 32000.0,
@@ -811,7 +811,11 @@ it('computes different loan packages', function (array $params) {
 //        dd($mortgage->getLoan()->getMonthlyAmortization()->inclusive()->getAmount()->toFloat());
         expect($mortgage->getLoan()->getMonthlyAmortization()->inclusive()->compareTo($params[Assert::LOAN_AMORTIZATION]))->toBe(Amount::EQUAL);
         expect($data->loan_amortization)->toBe($params[Assert::LOAN_AMORTIZATION]);
+
+        expect($mortgage->getLoan()->getTotalAddOnFeesToPayment()->inclusive()->getAmount()->toFloat())->toBe($params[Assert::ADD_ON_FEES_TO_PAYMENT]);
+
 //        dd($mortgage->getPartialMiscellaneousFees()->inclusive()->getAmount()->toFloat());
+
         expect($mortgage->getPartialMiscellaneousFees()->inclusive()->compareTo($params[Assert::PARTIAL_MISCELLANEOUS_FEES]))->toBe(Amount::EQUAL);
         expect($data->partial_miscellaneous_fees)->toBe($params[Assert::PARTIAL_MISCELLANEOUS_FEES]);
 //        dd($mortgage->getIncomeRequirement());
@@ -832,7 +836,6 @@ it('computes different loan packages', function (array $params) {
 //        dd($mortgage->getTotalCashOut(Account::CASH_OUT)->inclusive()->getAmount()->toFloat())->toBe($params[Assert::CASH_OUT]);
         expect($mortgage->getTotalCashOut()->inclusive()->getAmount()->toFloat())->toBe($params[Assert::CASH_OUT]);
         expect($data->cash_out)->toBe($params[Assert::CASH_OUT]);
-//        expect($mortgage->getTotalAddOnFeesToLoanAmortization()->inclusive()->getAmount()->toFloat())->toBe($params[Assert::ADD_ON_FEES_TO_LOAN_AMORTIZATION]);
     });
 })->with('sample-loan-computation');
 
@@ -1027,6 +1030,7 @@ it('has mortgage data', function (array $params) {
         expect($data->dp_amortization)->toBe((float) $mortgage->getBalanceDownPayment()->getMonthlyAmortization()->inclusive()->getAmount()->toFloat());
         expect($data->loan_amount)->toBe((float) $params[Assert::LOAN_AMOUNT]);
         expect($data->loan_amortization)->toBe((float) $params[Assert::LOAN_AMORTIZATION]);
+        expect($data->add_on_fees_to_payment)->toBe((float) $params[Assert::ADD_ON_FEES_TO_PAYMENT]);
         expect($data->partial_miscellaneous_fees)->toBe((float) $params[Assert::PARTIAL_MISCELLANEOUS_FEES]);
         expect($data->income_requirement_multiplier)->toBe((float) $params[Assert::INCOME_REQUIREMENT_MULTIPLIER]);
         expect($data->joint_disposable_monthly_income)->toBe((float) $params[Assert::JOINT_DISPOSABLE_MONTHLY_INCOME]);
