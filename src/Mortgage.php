@@ -51,7 +51,7 @@ use Homeful\Mortgage\Enums\Account;
  * @method Price getConsultingFee()
  * @method Mortgage setConsultingFee(Price|float $consulting_fee)
  * @method Price getProcessingFee()
- * @method Mortgage setProcessingFee(Price|float $processing_fee)
+ * @method Mortgage setProcessingFee(Price|float $processing_fee, Price|float|null $waived_amount = null)
  */
 final class Mortgage
 {
@@ -90,6 +90,8 @@ final class Mortgage
             Input::MORTGAGE_REDEMPTION_INSURANCE =>  ['nullable', 'numeric', 'min:0.0', 'max:10000.0'],
             Input::ANNUAL_FIRE_INSURANCE =>  ['nullable', 'numeric', 'min:0.0', 'max:10000.0'],
             Input::INCOME_REQUIREMENT_MULTIPLIER => ['nullable', 'numeric', 'min:0', 'max:1'],
+            Input::WAIVED_PROCESSING_FEE => ['nullable', 'numeric', 'min:0.0'],
+
         ]);
 
         if (!isset($validated[Input::PERCENT_DP]))
@@ -125,6 +127,7 @@ final class Mortgage
     {
         $consulting_fee = (float) Arr::get($params, Input::CONSULTING_FEE, 0.0);
         $processing_fee = (float) Arr::get($params, Input::PROCESSING_FEE, 0.0);
+        $waived_processing_fee = (float) Arr::get($params, Input::WAIVED_PROCESSING_FEE, 0.0);
         $dp_percent = (float) Arr::get($params, Input::PERCENT_DP, 0.0);
         $bp_term = (int) Arr::get($params, Input::BP_TERM, 1);
         $bp_interest_rate = (float) Arr::get($params, Input::BP_INTEREST_RATE, 0.0);
@@ -144,7 +147,7 @@ final class Mortgage
 //        $consulting_fee = 1000;
         $this
             ->setConsultingFee($consulting_fee)
-            ->setProcessingFee($processing_fee)
+            ->setProcessingFee($processing_fee, $waived_processing_fee)
             ->setPercentDownPayment($dp_percent)
             ->setBalancepaymentTerm($bp_term)
             ->setInterestRate($bp_interest_rate)

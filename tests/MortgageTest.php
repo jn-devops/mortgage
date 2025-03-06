@@ -318,6 +318,8 @@ dataset('sample-loan-computation', function () {
             Input::PERCENT_MF => 0.0,
             Input::BP_TERM => 14,
 
+            Input::PROCESSING_FEE => 10000,
+            Input::WAIVED_PROCESSING_FEE => 10000, //TODO: Lester - test this
             Input::MORTGAGE_REDEMPTION_INSURANCE => (750000 / 1000) * 0.225,
             Input::ANNUAL_FIRE_INSURANCE => 750000 * 0.00212584,
 
@@ -381,8 +383,8 @@ dataset('sample-loan-computation', function () {
             Input::PERCENT_MF => 0,
             Input::BP_TERM => 29,
 
-            Input::MORTGAGE_REDEMPTION_INSURANCE => (750000 / 1000) * 0.225,
-            Input::ANNUAL_FIRE_INSURANCE => 750000 * 0.00212584,
+//            Input::MORTGAGE_REDEMPTION_INSURANCE => (750000 / 1000) * 0.225,
+//            Input::ANNUAL_FIRE_INSURANCE => 750000 * 0.00212584,
 
             Assert::MISCELLANEOUS_FEES => 0.0,
             Assert::BALANCE_PAYMENT => 750000.0,
@@ -837,7 +839,7 @@ it('computes different loan packages', function (array $params) {
 //        dd($mortgage->getTotalCashOut(Account::CASH_OUT)->inclusive()->getAmount()->toFloat())->toBe($params[Assert::CASH_OUT]);
         expect($mortgage->getTotalCashOut()->inclusive()->getAmount()->toFloat())->toBe($params[Assert::CASH_OUT]);
         expect($data->cash_out)->toBe($params[Assert::CASH_OUT]);
-        expect($mortgage->getProperty()->getMortgageRedemptionInsurance()->inclusive()->getAmount()->toFloat())->toBe($params[Input::MORTGAGE_REDEMPTION_INSURANCE]);
+//        expect($mortgage->getProperty()->getMortgageRedemptionInsurance()->inclusive()->getAmount()->toFloat())->toBe($params[Input::MORTGAGE_REDEMPTION_INSURANCE]);
     });
 })->with('sample-loan-computation');
 

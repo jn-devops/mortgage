@@ -182,30 +182,71 @@ trait HasCashOuts
     /**
      * Set the processing fee for the mortgage/payment.
      *
-     * This method accepts a processing fee (either as a Price object or a float). It converts the fee into
-     * a numeric value using the inclusive amount if it is a Price instance. If the fee is greater than zero,
-     * it adds a deductible fee to the cash-out collection. The fee is identified by the constant
-     * `Input::PROCESSING_FEE` and is tagged with the value from `Account::DOWN_PAYMENT->value`.
+     * This method accepts a processing fee and an optional waived amount, both of which can be provided
+     * as either a Price object or a float. It calculates the net processing fee by subtracting the
+     * waived amount from the processing fee and ensuring the result is not negative.
+     *
+     * If the calculated fee is greater than zero, it adds a deductible fee to the cash-out collection.
+     * The fee is identified by the constant `Input::PROCESSING_FEE` and is tagged with the value
+     * from `Account::DOWN_PAYMENT->value`.
      *
      * @param Price|float $processing_fee The processing fee amount.
+     * @param Price|float|null $waived_amount The optional waived amount to reduce the processing fee.
      * @return HasCashOuts|Mortgage Returns the current instance for method chaining.
      */
-    public function setProcessingFee(Price|float $processing_fee): self
+    public function setProcessingFee(Price|float $processing_fee, Price|float|null $waived_amount = null): self
     {
-        // Convert the processing fee to a float, handling Price instances accordingly.
-        $value = $processing_fee instanceof Price
+        // Convert processing fee and waived amount to float, handling Price instances accordingly.
+        $fee_value = $processing_fee instanceof Price
             ? $processing_fee->inclusive()->getAmount()->toFloat()
             : $processing_fee;
 
-        // If the fee is greater than zero, add it as a deductible fee.
-        if ($value > 0.0) {
+        $waived_value = $waived_amount instanceof Price
+            ? $waived_amount->inclusive()->getAmount()->toFloat()
+            : ($waived_amount ?? 0.0);
+
+        // Calculate the net processing fee, ensuring it is not negative.
+        $net_value = max(0, $fee_value - $waived_value);
+
+        // If the net fee is greater than zero, add it as a deductible fee.
+        if ($net_value > 0.0) {
             $this->addCashOut(new DeductibleFeeFromPayment(
                 name: Input::PROCESSING_FEE,
-                amount: $processing_fee,
+                amount: $net_value,
                 tag: Account::DOWN_PAYMENT->value
             ));
         }
 
         return $this;
     }
+
+//    /**
+//     * Set the processing fee for the mortgage/payment.
+//     *
+//     * This method accepts a processing fee (either as a Price object or a float). It converts the fee into
+//     * a numeric value using the inclusive amount if it is a Price instance. If the fee is greater than zero,
+//     * it adds a deductible fee to the cash-out collection. The fee is identified by the constant
+//     * `Input::PROCESSING_FEE` and is tagged with the value from `Account::DOWN_PAYMENT->value`.
+//     *
+//     * @param Price|float $processing_fee The processing fee amount.
+//     * @return HasCashOuts|Mortgage Returns the current instance for method chaining.
+//     */
+//    public function setProcessingFee(Price|float $processing_fee): self
+//    {
+//        // Convert the processing fee to a float, handling Price instances accordingly.
+//        $value = $processing_fee instanceof Price
+//            ? $processing_fee->inclusive()->getAmount()->toFloat()
+//            : $processing_fee;
+//
+//        // If the fee is greater than zero, add it as a deductible fee.
+//        if ($value > 0.0) {
+//            $this->addCashOut(new DeductibleFeeFromPayment(
+//                name: Input::PROCESSING_FEE,
+//                amount: $processing_fee,
+//                tag: Account::DOWN_PAYMENT->value
+//            ));
+//        }
+//
+//        return $this;
+//    }
 }
