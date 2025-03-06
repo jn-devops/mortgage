@@ -2,6 +2,10 @@
 
 All notable changes to `mortgage` will be documented in this file.
 
+## #v1.2.86 - 2025-03-06
+
+add waived processing fee
+
 ## #v1.2.85 - 2025-03-02
 
 add fees automatically to monthly amortization
