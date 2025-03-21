@@ -1,10 +1,11 @@
+
 # 🏡 Mortgage Computation Package
 
 This package encapsulates the mortgage loan processing logic of the Homeful platform. It manages everything from borrower evaluation to monthly amortization, income requirements, and cash-out computations. The design is modular, chainable, and test-driven.
 
 ## Installation
 
-```
+```bash
 composer require homeful/mortgage
 ```
 
@@ -74,14 +75,31 @@ composer require homeful/mortgage
 
 ---
 
-## 🧪 Tests Included
+## 🧪 Test Coverage
 
-- Fee configuration & validation
-- Various mortgage packages (sample use cases)
-- Income requirement matching
-- Loan difference computation
-- Cash-out validations
-- Event handling
+Includes over 15 real-world scenarios such as:
+
+- ✅ Agapeya 70/50 Duplex @ 20, 25, and 30 years
+- ✅ Ter-Je 2BR 40sqm @ 20, 25, 30 years
+- ✅ Low-income housing simulation with ₱750K TCP
+- ✅ Relaxed GMI multiplier cases (30% vs 35%)
+- ✅ Promo: zero down payment + waived fees
+- ✅ Add-on MRI + Fire Insurance added to monthly amortization
+- ✅ Present Value edge cases
+- ✅ GMI-based maximum loan calculations
+- ✅ Full simulation using `createWithTypicalBorrower(...)`
+
+Each test checks:
+
+- Down Payment (amount + amortization)
+- Balance Payment
+- Miscellaneous Fees (partial & full)
+- Loan Amount
+- Loan Amortization
+- GMI / Disposable Income & Present Value eligibility
+- Add-on and deductible fee mechanics
+- Cash out summaries
+- Promo eligibility flags
 
 ---
 
@@ -104,9 +122,7 @@ composer require homeful/mortgage
 
 ---
 
-## Usage
-
-Here's a basic usage example to simulate a mortgage package:
+## 🧰 Usage
 
 ```php
 use Homeful\Mortgage\Mortgage;
@@ -116,23 +132,20 @@ use Homeful\Common\Classes\Input;
 use Homeful\Mortgage\Data\MortgageData;
 use Illuminate\Support\Carbon;
 use Whitecube\Price\Price;
-use Brick\Money\Money;
 
-$tcp = 2500000;
 $params = [
     Input::WAGES => 50000,
-    Input::TCP => $tcp,
+    Input::TCP => 2500000,
     Input::PERCENT_DP => 5 / 100,
     Input::DP_TERM => 12,
     Input::BP_INTEREST_RATE => 7 / 100,
     Input::PERCENT_MF => 8.5 / 100,
-    Input::LOW_CASH_OUT => 0.0,
     Input::BP_TERM => 20,
 ];
 
 $property = (new Property)
-    ->setTotalContractPrice(Price::of($tcp, 'PHP'))
-    ->setAppraisedValue(Price::of($tcp, 'PHP'));
+    ->setTotalContractPrice(Price::of($params[Input::TCP], 'PHP'))
+    ->setAppraisedValue(Price::of($params[Input::TCP], 'PHP'));
 
 $borrower = (new Borrower($property))
     ->setBirthdate(Carbon::parse('1999-03-17'))
@@ -144,21 +157,17 @@ $data = MortgageData::fromObject($mortgage);
 dd($data->toArray());
 ```
 
-This will output a complete array of all derived mortgage values like down payment, amortizations, loan amount, income requirement, and more.
+---
 
-### Test Coverage
+## 📊 Summary
 
-### Summary
+The Mortgage package serves as the computation core for:
 
-This package is intended to act as the core engine for mortgage calculators, simulators, and affordability evaluators in housing or real estate applications.
-
-Sample test cases cover:
-
-- Varying down payment terms
-- Configurable miscellaneous fees
-- Contract price changes
-- Mortgage variations by market segments (e.g. ECONOMIC)
-- Income-based qualification scenarios
-- Present value evaluations based on borrower’s disposable income
+- Housing affordability simulations
+- Loan qualification engines
+- Down payment amortization planners
+- Present value loan caps
+- Promotional packages with waived fees
+- Cross-segment real estate products
 
 Behold, a new you awaits – with well-structured mortgage processing 🏡✨
