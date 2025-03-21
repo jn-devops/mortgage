@@ -1,76 +1,101 @@
-# Homeful Mortgage Package
+# 🏡 Mortgage Computation Package
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/jn-devops/mortgage.svg?style=flat-square)](https://packagist.org/packages/jn-devops/mortgage)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/jn-devops/mortgage/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/jn-devops/mortgage/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/jn-devops/mortgage/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/jn-devops/mortgage/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/jn-devops/mortgage.svg?style=flat-square)](https://packagist.org/packages/jn-devops/mortgage)
+This package encapsulates the mortgage loan processing logic of the Homeful platform. It manages everything from borrower evaluation to monthly amortization, income requirements, and cash-out computations. The design is modular, chainable, and test-driven.
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+---
 
-## Installation
+## ✨ Features Overview
 
-You can install the package via composer:
+- **Encapsulated `Mortgage` Class**: Central to processing and configuring a mortgage loan.
+- **Modular Traits**: Responsibilities are split across focused, reusable traits.
+- **Supports Add-on & Deductible Fees**: MRI, Fire Insurance, Consulting, Processing fees, etc.
+- **Dynamic GMI & PV-based Eligibility**: Computes present value from disposable income.
+- **Test-driven**: Includes comprehensive real-world loan scenarios with expected outputs.
+- **Fluent API**: Chainable configuration methods (`setX()->setY()`).
 
-```bash
-composer require jn-devops/mortgage
-```
+---
 
-You can publish and run the migrations with:
+## 🔧 Trait Responsibilities
 
-```bash
-php artisan vendor:publish --tag="mortgage-migrations"
-php artisan migrate
-```
+### 🔢 Financial Computation
+- `HasContractPrice`: Manages TCP (Total Contract Price)
+- `HasDownPayment`: Computes down payment and amortization
+- `HasMiscellaneousFees`: Additional fees (computed or set)
+- `HasMultipliers`: Interest rates, income multipliers
+- `HasTerms`: Manages loan balance terms
 
-You can publish the config file with:
+### 💸 Cash Flow Management
+- `HasCashOuts`: Abstract layer for any outgoing cash items
+- `HasAddOnFeesToLoanAmortization`: Adds MRI & Fire Insurance to monthly amortization
 
-```bash
-php artisan vendor:publish --tag="mortgage-config"
-```
+### 👥 Parties
+- `HasProperty`: Assigns & syncs `Property` instance
+- `HasBorrower`: Assigns borrower & GMI rules
 
-This is the contents of the published config file:
+### 🎁 Promotions
+- `HasPromos`: Low-cash-out promo logic
+- `isPromotional()`: Detects promotional packages
 
-```php
-return [
-];
-```
+### ⚙️ Static Config
+- `HasConfig`: Reads default term, interest rate, borrower age from config
 
-Optionally, you can publish the views using
+---
 
-```bash
-php artisan vendor:publish --tag="mortgage-views"
-```
+## 🧮 Computation Flow
 
-## Usage
+1. **Validation**: Inputs validated using Laravel validator
+2. **Defaults**: Loaded from `Property` and `Borrower` if not provided
+3. **Processing**:
+    - Down Payment
+    - Balance Payment
+    - Miscellaneous Fees
+    - Cash Outs
+    - Loan Details (term, interest, income requirement)
 
-```php
-$mortgage = new Homeful\Mortgage();
-echo $mortgage->echoPhrase('Hello, Homeful!');
-```
+### 🔍 Formula Highlights
 
-## Testing
+- **Balance Payment** = TCP – Down Payment
+- **Loan Principal** = Balance Payment + Balance Misc. Fees
+- **Loan Amortization** = Payment + (MRI + Fire Insurance if applicable)
 
-```bash
-composer test
-```
+---
 
-## Changelog
+## ✅ Eligibility Tools
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+- `getLoanDifference()`: Checks if borrower can afford based on income
+- `getPresentValueFromMonthlyDisposableIncomePayments()`: PV computation using borrower income
+- `getJointBorrowerDisposableMonthlyIncome()`: Computes combined disposable income
 
-## Contributing
+---
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+## 🧪 Tests Included
 
-## Security Vulnerabilities
+- Fee configuration & validation
+- Various mortgage packages (sample use cases)
+- Income requirement matching
+- Loan difference computation
+- Cash-out validations
+- Event handling
 
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
+---
 
-## Credits
+## 🧠 Design Insights
 
-- [Lester B. Hurtado](https://github.com/jn-devops)
-- [All Contributors](../../contributors)
+- **Event Driven**: Traits dispatch events on update
+- **Chainable API**: Fluent configuration methods
+- **Precision Math**: Uses `Brick\Money` + `Whitecube\Price`
+- **Compliance Ready**: Validates ranges for fees, DP, terms
+- **Fully Tested**: Aligns with `PMT`, `PV` financial functions for accuracy
 
-## License
+---
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+## 🔗 Key Integrations
+
+- `Homeful\Payment\Payment`: Loan logic & computation
+- `Homeful\Property\Property`: Provides TCP, MF %, etc.
+- `Homeful\Borrower\Borrower`: Age, income, region
+- `Homeful\Common\Classes`: Shared value object helpers
+
+---
+
+Behold, a new you awaits – with well-structured mortgage processing 🏡✨
