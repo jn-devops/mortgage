@@ -2,6 +2,12 @@
 
 This package encapsulates the mortgage loan processing logic of the Homeful platform. It manages everything from borrower evaluation to monthly amortization, income requirements, and cash-out computations. The design is modular, chainable, and test-driven.
 
+## Installation
+
+```
+composer require homeful/mortgage
+```
+
 ---
 
 ## ✨ Features Overview
@@ -97,5 +103,62 @@ This package encapsulates the mortgage loan processing logic of the Homeful plat
 - `Homeful\Common\Classes`: Shared value object helpers
 
 ---
+
+## Usage
+
+Here's a basic usage example to simulate a mortgage package:
+
+```php
+use Homeful\Mortgage\Mortgage;
+use Homeful\Borrower\Borrower;
+use Homeful\Property\Property;
+use Homeful\Common\Classes\Input;
+use Homeful\Mortgage\Data\MortgageData;
+use Illuminate\Support\Carbon;
+use Whitecube\Price\Price;
+use Brick\Money\Money;
+
+$tcp = 2500000;
+$params = [
+    Input::WAGES => 50000,
+    Input::TCP => $tcp,
+    Input::PERCENT_DP => 5 / 100,
+    Input::DP_TERM => 12,
+    Input::BP_INTEREST_RATE => 7 / 100,
+    Input::PERCENT_MF => 8.5 / 100,
+    Input::LOW_CASH_OUT => 0.0,
+    Input::BP_TERM => 20,
+];
+
+$property = (new Property)
+    ->setTotalContractPrice(Price::of($tcp, 'PHP'))
+    ->setAppraisedValue(Price::of($tcp, 'PHP'));
+
+$borrower = (new Borrower($property))
+    ->setBirthdate(Carbon::parse('1999-03-17'))
+    ->setGrossMonthlyIncome($params[Input::WAGES]);
+
+$mortgage = new Mortgage(property: $property, borrower: $borrower, params: $params);
+$data = MortgageData::fromObject($mortgage);
+
+dd($data->toArray());
+```
+
+This will output a complete array of all derived mortgage values like down payment, amortizations, loan amount, income requirement, and more.
+
+### Test Coverage
+
+### Summary
+
+This package is intended to act as the core engine for mortgage calculators, simulators, and affordability evaluators in housing or real estate applications.
+
+Sample test cases cover:
+
+- Varying down payment terms
+- Configurable miscellaneous fees
+- Contract price changes
+- Mortgage variations by market segments (e.g. ECONOMIC)
+- Income-based qualification scenarios
+- Present value evaluations based on borrower’s disposable income
 
 Behold, a new you awaits – with well-structured mortgage processing 🏡✨
